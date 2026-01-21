@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle Operación - Death Squad Airsoft</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .detalle-header {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--green) 100%);
+            color: var(--white);
+            padding: 3rem 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .detalle-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .codigo-operacion {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: var(--white);
+            border-left: 4px solid var(--green);
+            padding: 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card h3 {
+            color: var(--green);
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-card p {
+            margin: 0.5rem 0;
+            color: var(--black);
+            font-size: 1rem;
+        }
+
+        .seccion {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .seccion h2 {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .requisitos-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .requisitos-list li {
+            padding: 0.8rem;
+            background: #f9f9f9;
+            margin-bottom: 0.8rem;
+            border-radius: 4px;
+            border-left: 3px solid var(--green);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .requisitos-list i {
+            color: var(--green);
+            font-size: 1.2rem;
+        }
+
+        .cupos-info {
+            background: linear-gradient(135deg, var(--light-green), var(--green));
+            color: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .cupos-info h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cupos-barra {
+            width: 100%;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .cupos-progreso {
+            height: 100%;
+            width: 30%;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .acciones {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .acciones .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem;
+        }
+
+        .estado-inscripcion {
+            padding: 1.5rem;
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            border-radius: 4px;
+            color: #155724;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .estado-inscripcion.activo {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .detalle-header {
+                padding: 2rem 1rem;
+            }
+
+            .detalle-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .acciones {
+                flex-direction: column;
+            }
+
+            .acciones .btn {
+                min-width: auto;
+            }
+
+            .seccion {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER FIJO -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-gun"></i>
+            <span>Death Squad Airsoft</span>
+        </div>
+        <button id="menu-toggle" class="menu-toggle" style="display: none;">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav id="navbar">
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li class="dropdown">
+                    <a href="#">Operaciones <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="index.html#operaciones-activas">Operaciones Activas</a>
+                        <a href="index.html#operaciones-pasadas">Operaciones Pasadas</a>
+                    </div>
+                </li>
+                <li><a href="perfil.html">Mi Perfil</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button class="btn btn-secondary">Iniciar Sesión</button>
+                <button class="btn btn-primary" onclick="window.location.href='registro.html'">Registrarse</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- HEADER DE OPERACIÓN -->
+            <div class="detalle-header">
+                <div class="codigo-operacion">
+                    <strong>Operación:</strong> <span id="cod-operacion">OP-2026-001</span>
+                </div>
+                <h1 id="titulo-operacion">OPERACIÓN TÁCTICA URBANA</h1>
+            </div>
+
+            <!-- INFORMACIÓN GENERAL -->
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><i class="fas fa-calendar"></i> Fecha</h3>
+                    <p id="fecha-operacion">28 de Febrero, 2026</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-clock"></i> Hora</h3>
+                    <p id="hora-operacion">10:00 - 16:00</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-map-marker-alt"></i> Ubicación</h3>
+                    <p id="ubicacion-operacion">Zona Industrial, Montevideo</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-crosshairs"></i> Tipo de Juego</h3>
+                    <p id="tipo-juego">Team Deathmatch</p>
+                </div>
+            </div>
+
+            <!-- INFORMACIÓN DE CUPOS -->
+            <div class="cupos-info">
+                <h3><span id="cupos-disponibles">12</span> de <span id="cupos-totales">40</span> Cupos</h3>
+                <p style="margin: 0.5rem 0;">Lugares disponibles</p>
+                <div class="cupos-barra">
+                    <div class="cupos-progreso" id="barra-progreso"></div>
+                </div>
+                <p style="margin: 0.5rem 0; font-size: 0.9rem;"><span id="porcentaje-cupos">30%</span> ocupado</p>
+            </div>
+
+            <!-- ESTADO DE INSCRIPCIÓN -->
+            <div id="estado-inscripcion" class="estado-inscripcion">
+                <i class="fas fa-check-circle"></i> <strong>¡Ya estás inscripto!</strong> Tu participación está confirmada para esta operación.
+            </div>
+
+            <!-- DESCRIPCIÓN Y HISTORIA -->
+            <div class="seccion">
+                <h2><i class="fas fa-book"></i> Historia / Lore</h2>
+                <p id="descripcion-operacion">
+                    Una célula de operativos hostiles ha tomado control de un complejo industrial estratégico. 
+                    Tu equipo debe trabajar en coordinación para recuperar el control del área. 
+                    La comunicación y la estrategia serán claves para el éxito de esta misión tácticas.
+                </p>
+            </div>
+
+            <!-- REQUISITOS -->
+            <div class="seccion">
+                <h2><i class="fas fa-list-check"></i> Requisitos y Equipamiento</h2>
+                <ul class="requisitos-list">
+                    <li><i class="fas fa-check"></i> Réplica de airsoft funcional (FPS mínimo: 350)</li>
+                    <li><i class="fas fa-check"></i> Protección ocular (goggles certificados)</li>
+                    <li><i class="fas fa-check"></i> Chaleco o pechera táctico</li>
+                    <li><i class="fas fa-check"></i> Mínimo 2 cargadores</li>
+                    <li><i class="fas fa-check"></i> Batería completamente cargada o gas suficiente</li>
+                    <li><i class="fas fa-check"></i> Botella de agua (obligatorio)</li>
+                    <li><i class="fas fa-check"></i> Documento de identidad</li>
+                </ul>
+            </div>
+
+            <!-- REGLAS -->
+            <div class="seccion">
+                <h2><i class="fas fa-gavel"></i> Reglas de la Operación</h2>
+                <ul class="requisitos-list">
+                    <li><i class="fas fa-check"></i> Los disparos a corta distancia deben ser identificados (30 metros mínimo para zona de castigo)</li>
+                    <li><i class="fas fa-check"></i> Al ser "eliminado", debes esperar 5 minutos antes de reingresar a zona activa</li>
+                    <li><i class="fas fa-check"></i> Las armas se deben asegurar antes de abandonar el área</li>
+                    <li><i class="fas fa-check"></i> Respetar el código de honor y las decisiones del staff</li>
+                    <li><i class="fas fa-check"></i> Prohibido el consumo de alcohol durante el evento</li>
+                    <li><i class="fas fa-check"></i> Uso obligatorio de casco o headwear</li>
+                </ul>
+            </div>
+
+            <!-- ACCIONES -->
+            <div class="acciones">
+                <button id="btn-inscribir" class="btn btn-primary" onclick="inscribirse()">
+                    <i class="fas fa-check-circle"></i> Inscribirse a la Operación
+                </button>
+                <button id="btn-desinscribir" class="btn btn-secondary" onclick="desinscribirse()" style="display: none;">
+                    <i class="fas fa-times-circle"></i> Desinscribirse
+                </button>
+                <a href="index.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Death Squad Airsoft. Todos los derechos reservados.</p>
+        <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+            <a href="#" style="color: var(--accent); text-decoration: none;">Términos y Condiciones</a> | 
+            <a href="#" style="color: var(--accent); text-decoration: none;">Privacidad</a> | 
+            <a href="#" style="color: var(--accent); text-decoration: none;">Contacto</a>
+        </p>
+    </footer>
+
+    <script>
+        // BASE DE DATOS DE OPERACIONES
+        const operaciones = {
+            'OP-2026-001': {
+                titulo: 'OPERACIÓN TÁCTICA URBANA',
+                fecha: '28 de Febrero, 2026',
+                hora: '10:00 - 16:00',
+                ubicacion: 'Zona Industrial, Montevideo',
+                tipo: 'Team Deathmatch',
+                cupos: { disponibles: 12, totales: 40 },
+                descripcion: 'Una célula de operativos hostiles ha tomado control de un complejo industrial estratégico. Tu equipo debe trabajar en coordinación para recuperar el control del área. La comunicación y la estrategia serán claves para el éxito de esta misión táctica.',
+                requisitos: [
+                    'Réplica de airsoft funcional (FPS mínimo: 350)',
+                    'Protección ocular (goggles certificados)',
+                    'Chaleco o pechera táctico',
+                    'Mínimo 2 cargadores',
+                    'Batería completamente cargada o gas suficiente',
+                    'Botella de agua (obligatorio)',
+                    'Documento de identidad'
+                ]
+            },
+            'OP-2026-002': {
+                titulo: 'RESCATE VIP',
+                fecha: '15 de Marzo, 2026',
+                hora: '09:00 - 15:00',
+                ubicacion: 'Campo Las Piedras',
+                tipo: 'Objetivo Especial',
+                cupos: { disponibles: 5, totales: 40 },
+                descripcion: 'Una misión de rescate de alto perfil. Los operadores deben infiltrarse en territorio enemigo, localizar al objetivo y extraerlo sin ser detectados.',
+                requisitos: [
+                    'Réplica de airsoft funcional (FPS mínimo: 350)',
+                    'Protección ocular (goggles certificados)',
+                    'Ropa de camuflaje o táctica',
+                    'Mínimo 3 cargadores',
+                    'Batería completamente cargada',
+                    'Botella de agua (obligatorio)',
+                    'Documento de identidad'
+                ]
+            },
+            'OP-2026-003': {
+                titulo: 'CAPTURA DE BANDERA',
+                fecha: '22 de Marzo, 2026',
+                hora: '11:00 - 17:00',
+                ubicacion: 'Centro Urbano, Canelones',
+                tipo: 'CTF',
+                cupos: { disponibles: 35, totales: 40 },
+                descripcion: 'Dos equipos compiten para capturar la bandera del equipo opuesto. Un clásico del airsoft que requiere coordinación, estrategia y trabajo en equipo.',
+                requisitos: [
+                    'Réplica de airsoft funcional (FPS mínimo: 350)',
+                    'Protección ocular (goggles certificados)',
+                    'Equipo táctico o casual cómodo',
+                    'Mínimo 2 cargadores',
+                    'Batería completamente cargada o gas suficiente',
+                    'Botella de agua (obligatorio)',
+                    'Documento de identidad'
+                ]
+            }
+        };
+
+        // OBTENER PARÁMETROS DE URL
+        function getOperacionId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id') || 'OP-2026-001';
+        }
+
+        // CARGAR DATOS DE OPERACIÓN
+        function cargarOperacion() {
+            const opId = getOperacionId();
+            const op = operaciones[opId];
+
+            if (op) {
+                document.getElementById('cod-operacion').textContent = opId;
+                document.getElementById('titulo-operacion').textContent = op.titulo;
+                document.getElementById('fecha-operacion').textContent = op.fecha;
+                document.getElementById('hora-operacion').textContent = op.hora;
+                document.getElementById('ubicacion-operacion').textContent = op.ubicacion;
+                document.getElementById('tipo-juego').textContent = op.tipo;
+                document.getElementById('cupos-disponibles').textContent = op.cupos.disponibles;
+                document.getElementById('cupos-totales').textContent = op.cupos.totales;
+                document.getElementById('descripcion-operacion').textContent = op.descripcion;
+
+                // Calcular porcentaje
+                const ocupados = op.cupos.totales - op.cupos.disponibles;
+                const porcentaje = Math.round((ocupados / op.cupos.totales) * 100);
+                document.getElementById('porcentaje-cupos').textContent = porcentaje + '%';
+                document.getElementById('barra-progreso').style.width = porcentaje + '%';
+
+                // Renderizar requisitos
+                const listaRequisitos = document.querySelector('.requisitos-list');
+                listaRequisitos.innerHTML = '';
+                op.requisitos.forEach(req => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fas fa-check"></i> ${req}`;
+                    listaRequisitos.appendChild(li);
+                });
+            }
+        }
+
+        // INSCRIBIRSE
+        function inscribirse() {
+            // Verificar si el usuario está registrado (simulado)
+            const usuarioRegistrado = localStorage.getItem('usuarioRegistrado');
+            
+            if (!usuarioRegistrado) {
+                alert('⚠️ Debes registrarte primero para inscribirte a la operación.');
+                window.location.href = 'registro.html';
+                return;
+            }
+
+            alert('✓ ¡Inscripción exitosa! Te has registrado correctamente para esta operación.');
+            localStorage.setItem('inscripcion_' + getOperacionId(), 'true');
+            mostrarEstadoInscripcion();
+        }
+
+        // DESINSCRIBIRSE
+        function desinscribirse() {
+            if (confirm('¿Estás seguro que deseas desinscribirte de esta operación?')) {
+                alert('✓ Te has desinscripto correctamente de la operación.');
+                localStorage.removeItem('inscripcion_' + getOperacionId());
+                mostrarEstadoInscripcion();
+            }
+        }
+
+        // MOSTRAR ESTADO DE INSCRIPCIÓN
+        function mostrarEstadoInscripcion() {
+            const opId = getOperacionId();
+            const inscripto = localStorage.getItem('inscripcion_' + opId);
+            const btnInscribir = document.getElementById('btn-inscribir');
+            const btnDesinscribir = document.getElementById('btn-desinscribir');
+            const estadoDiv = document.getElementById('estado-inscripcion');
+
+            if (inscripto) {
+                btnInscribir.style.display = 'none';
+                btnDesinscribir.style.display = 'block';
+                estadoDiv.classList.add('activo');
+            } else {
+                btnInscribir.style.display = 'block';
+                btnDesinscribir.style.display = 'none';
+                estadoDiv.classList.remove('activo');
+            }
+        }
+
+        // MENÚ HAMBURGUESA RESPONSIVO
+        const menuToggle = document.getElementById('menu-toggle');
+        const navbar = document.getElementById('navbar');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                navbar.classList.toggle('active');
+            });
+        }
+
+        // DROPDOWN RESPONSIVO
+        document.addEventListener('click', function(e) {
+            const dropdown = e.target.closest('.dropdown');
+            
+            if (dropdown) {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    dropdown.classList.toggle('active');
+                }
+            } else if (!e.target.closest('nav')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+                if (navbar) navbar.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                if (navbar) navbar.classList.remove('active');
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            }
+        });
+
+        // INICIALIZAR
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarOperacion();
+            mostrarEstadoInscripcion();
+        });
+    </script>
+</body>
+</html>

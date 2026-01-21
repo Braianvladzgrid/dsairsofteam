@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprar Réplica - Death Squad Airsoft</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- HEADER FIJO -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-gun"></i>
+            <span>Death Squad Airsoft</span>
+        </div>
+        <button id="menu-toggle" class="menu-toggle" style="display: none;">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav id="navbar">
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li class="dropdown">
+                    <a href="#">Operaciones <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="index.html#operaciones-activas">Operaciones Activas</a>
+                        <a href="index.html#operaciones-pasadas">Operaciones Pasadas</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="#">Réplicas <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="alquiler.html">Alquilar mi Réplica</a>
+                        <a href="index.html#alquileres">Alquileres Disponibles</a>
+                        <a href="compra.html">Comprar Réplica</a>
+                    </div>
+                </li>
+                <li><a href="perfil.html">Mi Perfil</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button class="btn btn-secondary">Iniciar Sesión</button>
+                <button class="btn btn-primary" onclick="window.location.href='registro.html'">Registrarse</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- SECCIÓN COMPRA DE RÉPLICAS -->
+        <section id="comprar" class="container">
+            <h2><i class="fas fa-shopping-bag"></i> Comprar Réplica</h2>
+            <p style="text-align: center; color: var(--gray); margin-bottom: 2rem;">
+                Explora nuestro catálogo de réplicas nuevas y usadas de vendedores verificados.
+            </p>
+
+            <!-- FILTROS -->
+            <div style="background: var(--light-gray); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                <h3 style="color: var(--green); margin-bottom: 1rem;">Filtros</h3>
+                <div class="form-row" style="gap: 1rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="tipo-filtro">Tipo de Réplica</label>
+                        <select id="tipo-filtro">
+                            <option value="">Todos</option>
+                            <option value="aeg">AEG</option>
+                            <option value="gbb">GBB</option>
+                            <option value="sniper">Sniper</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="estado-filtro">Estado</label>
+                        <select id="estado-filtro">
+                            <option value="">Todos</option>
+                            <option value="nuevo">Nuevo</option>
+                            <option value="excelente">Excelente</option>
+                            <option value="bueno">Bueno</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="precio-filtro">Precio Máximo</label>
+                        <input type="number" id="precio-filtro" placeholder="Ej: 200">
+                    </div>
+                </div>
+            </div>
+
+            <div class="replicas-grid">
+                <!-- PRODUCTO 1 -->
+                <div class="replica-card">
+                    <div class="replica-image">
+                        <i class="fas fa-gun"></i>
+                    </div>
+                    <div class="replica-body">
+                        <span class="replica-type">AEG NUEVA</span>
+                        <div class="replica-title">Cybergun SR25</div>
+                        <div class="replica-specs">
+                            <strong>FPS:</strong> 400 FPS<br>
+                            <strong>Sistema:</strong> Eléctrico<br>
+                            <strong>Estado:</strong> Nuevo<br>
+                            <strong>Compatibilidad:</strong> Todas las operaciones
+                        </div>
+                        <div class="price">$180</div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="alert('Artículo agregado al carrito')">
+                            <i class="fas fa-shopping-cart"></i> Comprar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PRODUCTO 2 -->
+                <div class="replica-card">
+                    <div class="replica-image">
+                        <i class="fas fa-gun"></i>
+                    </div>
+                    <div class="replica-body">
+                        <span class="replica-type">GBB USADO</span>
+                        <div class="replica-title">WE 1911 Kimber</div>
+                        <div class="replica-specs">
+                            <strong>FPS:</strong> 280 FPS<br>
+                            <strong>Sistema:</strong> Gas<br>
+                            <strong>Estado:</strong> Excelente<br>
+                            <strong>Vendedor:</strong> Verificado
+                        </div>
+                        <div class="price">$95</div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="alert('Contacto con vendedor')">
+                            <i class="fas fa-envelope"></i> Contactar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PRODUCTO 3 -->
+                <div class="replica-card">
+                    <div class="replica-image">
+                        <i class="fas fa-gun"></i>
+                    </div>
+                    <div class="replica-body">
+                        <span class="replica-type">ACCESORIOS</span>
+                        <div class="replica-title">Lote Táctico Completo</div>
+                        <div class="replica-specs">
+                            <strong>Incluye:</strong><br>
+                            • Molle Vest<br>
+                            • Cargadores x4<br>
+                            • Banda de pecho
+                        </div>
+                        <div class="price">$75</div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="alert('Artículo agregado al carrito')">
+                            <i class="fas fa-shopping-cart"></i> Comprar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PRODUCTO 4 -->
+                <div class="replica-card">
+                    <div class="replica-image">
+                        <i class="fas fa-gun"></i>
+                    </div>
+                    <div class="replica-body">
+                        <span class="replica-type">SNIPER NUEVO</span>
+                        <div class="replica-title">WELL MB4402 L96</div>
+                        <div class="replica-specs">
+                            <strong>FPS:</strong> 500 FPS<br>
+                            <strong>Sistema:</strong> Bolt Action<br>
+                            <strong>Estado:</strong> Nuevo<br>
+                            <strong>Incluye:</strong> Mira y Bipod
+                        </div>
+                        <div class="price">$220</div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="alert('Artículo agregado al carrito')">
+                            <i class="fas fa-shopping-cart"></i> Comprar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PRODUCTO 5 -->
+                <div class="replica-card">
+                    <div class="replica-image">
+                        <i class="fas fa-gun"></i>
+                    </div>
+                    <div class="replica-body">
+                        <span class="replica-type">AEG USADO</span>
+                        <div class="replica-title">G&G Combat Machine</div>
+                        <div class="replica-specs">
+                            <strong>FPS:</strong> 380 FPS<br>
+                            <strong>Sistema:</strong> Eléctrico<br>
+                            <strong>Estado:</strong> Bueno<br>
+                            <strong>Vendedor:</strong> Verificado
+                        </div>
+                        <div class="price">$140</div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="alert('Contacto con vendedor')">
+                            <i class="fas fa-envelope"></i> Contactar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PRODUCTO 6 -->
+                <div class="replica-card">
+                    <div class="replica-image">
+                        <i class="fas fa-gun"></i>
+                    </div>
+                    <div class="replica-body">
+                        <span class="replica-type">GBB NUEVO</span>
+                        <div class="replica-title">Tokyo Marui Glock 19</div>
+                        <div class="replica-specs">
+                            <strong>FPS:</strong> 260 FPS<br>
+                            <strong>Sistema:</strong> Gas<br>
+                            <strong>Estado:</strong> Nuevo<br>
+                            <strong>Compatibilidad:</strong> Excelente fiabilidad
+                        </div>
+                        <div class="price">$130</div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="alert('Artículo agregado al carrito')">
+                            <i class="fas fa-shopping-cart"></i> Comprar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="index.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Death Squad Airsoft. Todos los derechos reservados.</p>
+        <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+            <a href="#" style="color: var(--accent); text-decoration: none;">Términos y Condiciones</a> | 
+            <a href="#" style="color: var(--accent); text-decoration: none;">Privacidad</a> | 
+            <a href="#" style="color: var(--accent); text-decoration: none;">Contacto</a>
+        </p>
+    </footer>
+
+    <script>
+        // MENÚ HAMBURGUESA RESPONSIVO
+        const menuToggle = document.getElementById('menu-toggle');
+        const navbar = document.getElementById('navbar');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                navbar.classList.toggle('active');
+            });
+        }
+
+        // DROPDOWN RESPONSIVO
+        document.addEventListener('click', function(e) {
+            const dropdown = e.target.closest('.dropdown');
+            
+            if (dropdown) {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    dropdown.classList.toggle('active');
+                }
+            } else if (!e.target.closest('nav')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+                if (navbar) navbar.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                if (navbar) navbar.classList.remove('active');
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            }
+        });
+
+        // FILTROS
+        document.getElementById('tipo-filtro').addEventListener('change', function() {
+            // Aquí iría lógica de filtrado
+            console.log('Filtro de tipo:', this.value);
+        });
+    </script>
+</body>
+</html>

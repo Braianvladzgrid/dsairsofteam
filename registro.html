@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Death Squad Airsoft</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- HEADER FIJO -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-gun"></i>
+            <span>Death Squad Airsoft</span>
+        </div>
+        <button id="menu-toggle" class="menu-toggle" style="display: none;">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav id="navbar">
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li class="dropdown">
+                    <a href="#">Operaciones <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="index.html#operaciones-activas">Operaciones Activas</a>
+                        <a href="index.html#operaciones-pasadas">Operaciones Pasadas</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="#">Réplicas <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="alquiler.html">Alquilar mi Réplica</a>
+                        <a href="index.html#alquileres">Alquileres Disponibles</a>
+                        <a href="compra.html">Comprar Réplica</a>
+                    </div>
+                </li>
+                <li><a href="perfil.html">Mi Perfil</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button class="btn btn-secondary">Iniciar Sesión</button>
+                <button class="btn btn-primary" onclick="window.location.href='registro.html'">Registrarse</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- SECCIÓN DE REGISTRO -->
+        <section id="registro" class="container">
+            <h2><i class="fas fa-user-plus"></i> Registro de Jugador</h2>
+            <form style="max-width: 600px; margin: 0 auto;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" placeholder="Tu nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apellido">Apellido</label>
+                        <input type="text" id="apellido" placeholder="Tu apellido" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="documento">Documento de Identidad</label>
+                        <input type="text" id="documento" placeholder="12345678" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nacimiento">Fecha de Nacimiento</label>
+                        <input type="date" id="nacimiento" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="tu@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" placeholder="+598 9 xxxx xxxx" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nickname">Nickname (Airsoft)</label>
+                        <input type="text" id="nickname" placeholder="Tu alias táctico" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipo">Equipo (Opcional)</label>
+                        <input type="text" id="equipo" placeholder="Death Squad, etc.">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="rol">Rol en la Operación</label>
+                    <select id="rol" required>
+                        <option value="">-- Selecciona un rol --</option>
+                        <option value="asalto">Asalto</option>
+                        <option value="apoyo">Apoyo</option>
+                        <option value="sniper">Sniper</option>
+                        <option value="lider">Líder de equipo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="terminos" required>
+                        <label for="terminos">Acepto los términos y condiciones</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-bottom: 1rem;">
+                    <i class="fas fa-check-circle"></i> Crear Cuenta
+                </button>
+                <a href="index.html" class="btn btn-secondary" style="width: 100%; padding: 1rem; text-align: center;">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </form>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Death Squad Airsoft. Todos los derechos reservados.</p>
+        <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+            <a href="#" style="color: var(--accent); text-decoration: none;">Términos y Condiciones</a> | 
+            <a href="#" style="color: var(--accent); text-decoration: none;">Privacidad</a> | 
+            <a href="#" style="color: var(--accent); text-decoration: none;">Contacto</a>
+        </p>
+    </footer>
+
+    <script>
+        // MENÚ HAMBURGUESA RESPONSIVO
+        const menuToggle = document.getElementById('menu-toggle');
+        const navbar = document.getElementById('navbar');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                navbar.classList.toggle('active');
+            });
+        }
+
+        // SIMULACIÓN DE REGISTRO
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('✓ ¡Registro exitoso! Se ha generado tu código QR único. Redirección a Mi Perfil...');
+                    window.location.href = 'perfil.html';
+                });
+            }
+        });
+
+        // DROPDOWN RESPONSIVO
+        document.addEventListener('click', function(e) {
+            const dropdown = e.target.closest('.dropdown');
+            
+            if (dropdown) {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    dropdown.classList.toggle('active');
+                }
+            } else if (!e.target.closest('nav')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+                if (navbar) navbar.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                if (navbar) navbar.classList.remove('active');
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            }
+        });
+    </script>
+</body>
+</html>

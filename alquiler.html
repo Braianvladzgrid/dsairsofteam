@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alquilar Réplica - Death Squad Airsoft</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- HEADER FIJO -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-gun"></i>
+            <span>Death Squad Airsoft</span>
+        </div>
+        <button id="menu-toggle" class="menu-toggle" style="display: none;">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav id="navbar">
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li class="dropdown">
+                    <a href="#">Operaciones <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="index.html#operaciones-activas">Operaciones Activas</a>
+                        <a href="index.html#operaciones-pasadas">Operaciones Pasadas</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="#">Réplicas <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="alquiler.html">Alquilar mi Réplica</a>
+                        <a href="index.html#alquileres">Alquileres Disponibles</a>
+                        <a href="compra.html">Comprar Réplica</a>
+                    </div>
+                </li>
+                <li><a href="perfil.html">Mi Perfil</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button class="btn btn-secondary">Iniciar Sesión</button>
+                <button class="btn btn-primary" onclick="window.location.href='registro.html'">Registrarse</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- SECCIÓN ALQUILAR MI RÉPLICA -->
+        <section id="alquilar-replica" class="container">
+            <h2><i class="fas fa-upload"></i> Alquilar mi Réplica</h2>
+            <p style="text-align: center; color: var(--gray); margin-bottom: 2rem;">
+                Publica tu réplica para alquilarla en los próximos eventos. Será revisada por el equipo de staff antes de estar disponible.
+            </p>
+            
+            <form style="max-width: 700px; margin: 0 auto;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipo">Tipo de Réplica</label>
+                        <select id="tipo" required>
+                            <option value="">-- Selecciona tipo --</option>
+                            <option value="aeg">AEG (Eléctrica)</option>
+                            <option value="gbb">GBB (Gas)</option>
+                            <option value="sniper">Sniper (Bolt Action)</option>
+                            <option value="pistola">Pistola (GBB)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modelo">Marca / Modelo</label>
+                        <input type="text" id="modelo" placeholder="Ej: Cybergun M4A1" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fps">FPS</label>
+                        <input type="number" id="fps" placeholder="Ej: 350" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sistema">Sistema</label>
+                        <select id="sistema" required>
+                            <option value="">-- Selecciona sistema --</option>
+                            <option value="electrica">Eléctrica</option>
+                            <option value="gas">Gas</option>
+                            <option value="co2">CO2</option>
+                            <option value="muelle">Muelle</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="cargadores" checked>
+                        Incluye cargadores (sí/no)
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="bateria" checked>
+                        Incluye batería / gas (sí/no)
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="precio">Precio por Evento</label>
+                        <input type="number" id="precio" placeholder="Ej: 25" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="deposito">Depósito Requerido</label>
+                        <input type="number" id="deposito" placeholder="Ej: 50" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="condiciones">Condiciones de Uso</label>
+                    <textarea id="condiciones" placeholder="Describe las condiciones de uso (limpieza, mantenimiento, etc.)" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="fotos">Fotos de la Réplica</label>
+                    <input type="file" id="fotos" accept="image/*" multiple>
+                    <small style="color: var(--gray);">Selecciona una o más fotos</small>
+                </div>
+
+                <div class="form-group" style="padding: 1rem; background: #f0f8ff; border-radius: 4px; border-left: 4px solid var(--green);">
+                    <p style="margin: 0; color: var(--gray); font-size: 0.95rem;">
+                        <strong>ℹ️ Estado:</strong> Tu publicación será revisada por el equipo de staff. Una vez aprobada, estará visible para otros jugadores.
+                    </p>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 1.5rem; margin-bottom: 1rem;">
+                    <i class="fas fa-paper-plane"></i> Publicar Réplica
+                </button>
+                <a href="index.html" class="btn btn-secondary" style="width: 100%; padding: 1rem; text-align: center;">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </form>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Death Squad Airsoft. Todos los derechos reservados.</p>
+        <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+            <a href="#" style="color: var(--accent); text-decoration: none;">Términos y Condiciones</a> | 
+            <a href="#" style="color: var(--accent); text-decoration: none;">Privacidad</a> | 
+            <a href="#" style="color: var(--accent); text-decoration: none;">Contacto</a>
+        </p>
+    </footer>
+
+    <script>
+        // MENÚ HAMBURGUESA RESPONSIVO
+        const menuToggle = document.getElementById('menu-toggle');
+        const navbar = document.getElementById('navbar');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                navbar.classList.toggle('active');
+            });
+        }
+
+        // SIMULACIÓN DE PUBLICACIÓN
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('✓ ¡Réplica publicada! Será revisada por el equipo de staff en las próximas 24 horas.');
+                    form.reset();
+                });
+            }
+        });
+
+        // DROPDOWN RESPONSIVO
+        document.addEventListener('click', function(e) {
+            const dropdown = e.target.closest('.dropdown');
+            
+            if (dropdown) {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    dropdown.classList.toggle('active');
+                }
+            } else if (!e.target.closest('nav')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+                if (navbar) navbar.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                if (navbar) navbar.classList.remove('active');
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            }
+        });
+    </script>
+</body>
+</html>

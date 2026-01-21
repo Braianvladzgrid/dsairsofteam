@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - Death Squad Airsoft</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- HEADER FIJO -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-gun"></i>
+            <span>Death Squad Airsoft</span>
+        </div>
+        <button id="menu-toggle" class="menu-toggle" style="display: none;">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav id="navbar">
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li class="dropdown">
+                    <a href="#">Operaciones <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="index.html#operaciones-activas">Operaciones Activas</a>
+                        <a href="index.html#operaciones-pasadas">Operaciones Pasadas</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="#">Réplicas <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-menu">
+                        <a href="alquiler.html">Alquilar mi Réplica</a>
+                        <a href="index.html#alquileres">Alquileres Disponibles</a>
+                        <a href="compra.html">Comprar Réplica</a>
+                    </div>
+                </li>
+                <li><a href="perfil.html">Mi Perfil</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button class="btn btn-secondary">Iniciar Sesión</button>
+                <button class="btn btn-primary" onclick="window.location.href='registro.html'">Registrarse</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- SECCIÓN DE PERFIL -->
+        <section id="perfil" class="container">
+            <h2><i class="fas fa-user-circle"></i> Mi Perfil</h2>
+            <div class="profile-container">
+                <!-- TARJETA DE PERFIL -->
+                <div class="profile-card">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3>Juan Peláez</h3>
+                    <span class="status-badge status-active">Registrado</span>
+                </div>
+
+                <!-- INFORMACIÓN DEL PERFIL -->
+                <div class="profile-info">
+                    <div class="info-row">
+                        <span class="label-info">Nombre Completo:</span>
+                        <span>Juan Peláez García</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label-info">Documento:</span>
+                        <span>12.345.678-9</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label-info">Nickname:</span>
+                        <span>ShadowTactician</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label-info">Email:</span>
+                        <span>juan@example.com</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label-info">Teléfono:</span>
+                        <span>+598 9 1234 5678</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label-info">Equipo:</span>
+                        <span>Death Squad</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label-info">Operaciones Participadas:</span>
+                        <span><strong>5</strong></span>
+                    </div>
+
+                    <!-- CÓDIGO QR -->
+                    <div class="qr-section">
+                        <h4>Tu Código QR Único</h4>
+                        <p style="font-size: 0.9rem; margin: 0.5rem 0;">Presenta este código en los eventos para identificación rápida</p>
+                        <div class="qr-code">
+                            <div style="background: var(--light-green); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                                <span style="font-size: 0.8rem; text-align: center;">🔗 QR<br>ID: JST-2026-00847</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;">
+                            <i class="fas fa-download"></i> Descargar QR
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 2rem;">
+                        <a href="index.html" class="btn btn-primary" style="width: 100%; padding: 1rem; text-align: center;">
+                            <i class="fas fa-arrow-left"></i> Volver al Inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Death Squad Airsoft. Todos los derechos reservados.</p>
+        <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+            <a href="#" style="color: var(--accent); text-decoration: none;">Términos y Condiciones</a> | 
+            <a href="#" style="color: var(--accent); text-decoration: none;">Privacidad</a> | 
+            <a href="#" style="color: var(--accent); text-decoration: none;">Contacto</a>
+        </p>
+    </footer>
+
+    <script>
+        // MENÚ HAMBURGUESA RESPONSIVO
+        const menuToggle = document.getElementById('menu-toggle');
+        const navbar = document.getElementById('navbar');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function() {
+                navbar.classList.toggle('active');
+            });
+        }
+
+        // DROPDOWN RESPONSIVO
+        document.addEventListener('click', function(e) {
+            const dropdown = e.target.closest('.dropdown');
+            
+            if (dropdown) {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    dropdown.classList.toggle('active');
+                }
+            } else if (!e.target.closest('nav')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+                if (navbar) navbar.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                if (navbar) navbar.classList.remove('active');
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            }
+        });
+    </script>
+</body>
+</html>
