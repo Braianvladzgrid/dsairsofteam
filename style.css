@@ -50,6 +50,18 @@ header {
     color: var(--accent);
 }
 
+.logo-text {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.logo-text:hover {
+    color: var(--accent);
+}
+
 /* NAVEGACIÓN */
 nav {
     display: flex;
@@ -395,6 +407,33 @@ input, textarea, select {
     font-family: inherit;
     font-size: 1rem;
     transition: all 0.3s ease;
+}
+
+select {
+    background-color: var(--white);
+    color: var(--black);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232d5016' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    padding-right: 2.5rem;
+}
+
+select:hover {
+    border-color: var(--green);
+}
+
+select option {
+    background-color: var(--white);
+    color: var(--black);
+    padding: 0.5rem;
+}
+
+select option:checked {
+    background: linear-gradient(var(--light-green), var(--light-green));
+    background-color: var(--green);
+    color: var(--white);
 }
 
 input:focus, textarea:focus, select:focus {

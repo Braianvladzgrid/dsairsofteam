@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Operaciones</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-panel {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .admin-sidebar {
+            background: var(--dark);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .admin-sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .admin-sidebar a {
+            padding: 0.75rem 1rem;
+            background: var(--darker);
+            border-left: 3px solid transparent;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .admin-sidebar a:hover,
+        .admin-sidebar a.active {
+            background: var(--accent);
+            color: var(--dark);
+            border-left-color: var(--accent);
+        }
+
+        .admin-content {
+            background: var(--dark);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        .operations-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        .operations-table th {
+            background: var(--darker);
+            color: var(--accent);
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .operations-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--darker);
+        }
+
+        .operations-table tr:hover {
+            background: var(--darker);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #ff9800;
+            color: #000;
+        }
+
+        .status-in-progress {
+            background: #2196F3;
+            color: #fff;
+        }
+
+        .status-completed {
+            background: #4CAF50;
+            color: #fff;
+        }
+
+        .status-cancelled {
+            background: #f44336;
+            color: #fff;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-buttons button {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #1976D2;
+        }
+
+        .btn-delete:hover {
+            background: #da190b;
+        }
+
+        .btn-toggle-active {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .btn-toggle-active.active {
+            background: #4CAF50;
+        }
+
+        .btn-toggle-active.inactive {
+            background: #ff9800;
+        }
+
+        .btn-toggle-active:hover {
+            opacity: 0.8;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background: var(--dark);
+            margin: 5% auto;
+            padding: 2rem;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-close {
+            color: var(--accent);
+            float: right;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #ff4444;
+        }
+
+        @media (max-width: 768px) {
+            .admin-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-sidebar {
+                position: static;
+            }
+
+            .operations-table {
+                font-size: 0.9rem;
+            }
+
+            .operations-table th,
+            .operations-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER FIJO -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-gun"></i>
+            <a href="index.html" class="logo-text">Death Squad Airsoft - Admin</a>
+        </div>
+        <nav id="navbar">
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="perfil.html">Mi Perfil</a></li>
+                <li><a href="#" onclick="logout()">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="container">
+            <h2><i class="fas fa-cogs"></i> Panel de Administración</h2>
+
+            <div class="admin-panel">
+                <!-- SIDEBAR -->
+                <div class="admin-sidebar">
+                    <nav>
+                        <a href="#" class="admin-link active" data-section="operaciones">
+                            <i class="fas fa-list"></i> Operaciones
+                        </a>
+                        <a href="#" class="admin-link" data-section="estadisticas">
+                            <i class="fas fa-chart-bar"></i> Estadísticas
+                        </a>
+                        <a href="#" class="admin-link" data-section="usuarios">
+                            <i class="fas fa-users"></i> Usuarios
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- CONTENIDO -->
+                <div class="admin-content">
+                    <!-- OPERACIONES -->
+                    <div id="operaciones-section" class="admin-section active">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3>Gestión de Operaciones</h3>
+                            <button class="btn btn-primary" onclick="openNewOperationModal()">
+                                <i class="fas fa-plus"></i> Nueva Operación
+                            </button>
+                        </div>
+
+                        <div id="operaciones-loading" style="text-align: center; display: none;">
+                            <p><i class="fas fa-spinner fa-spin"></i> Cargando operaciones...</p>
+                        </div>
+
+                        <table class="operations-table" id="operaciones-table">
+                            <thead>
+                                <tr>
+                                    <th>Propiedad</th>
+                                    <th>Tipo</th>
+                                    <th>Precio</th>
+                                    <th>Estado</th>
+                                    <th>Activa</th>
+                                    <th>Inicio</th>
+                                    <th>Fin</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="operaciones-body">
+                                <tr>
+                                    <td colspan="7" style="text-align: center;">
+                                        <p><i class="fas fa-info-circle"></i> Cargando datos del servidor...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- ESTADÍSTICAS -->
+                    <div id="estadisticas-section" class="admin-section" style="display: none;">
+                        <h3>Estadísticas</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+                            <div style="background: var(--darker); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--accent);">
+                                <p style="color: var(--accent); margin: 0;">Total Operaciones</p>
+                                <p style="font-size: 2.5rem; font-weight: bold; margin: 0;" id="stat-total">-</p>
+                            </div>
+                            <div style="background: var(--darker); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ff9800;">
+                                <p style="color: #ff9800; margin: 0;">Pendientes</p>
+                                <p style="font-size: 2.5rem; font-weight: bold; margin: 0;" id="stat-pending">-</p>
+                            </div>
+                            <div style="background: var(--darker); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #2196F3;">
+                                <p style="color: #2196F3; margin: 0;">En Progreso</p>
+                                <p style="font-size: 2.5rem; font-weight: bold; margin: 0;" id="stat-progress">-</p>
+                            </div>
+                            <div style="background: var(--darker); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #4CAF50;">
+                                <p style="color: #4CAF50; margin: 0;">Completadas</p>
+                                <p style="font-size: 2.5rem; font-weight: bold; margin: 0;" id="stat-completed">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL NUEVA OPERACIÓN -->
+    <div id="operationModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('operationModal')">&times;</span>
+            <h3>Nueva Operación</h3>
+            <form id="operation-form" style="margin-top: 1.5rem;">
+                <div class="form-group">
+                    <label for="op-property">Propiedad ID</label>
+                    <input type="text" id="op-property" placeholder="UUID de la propiedad" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-seller">Vendedor ID</label>
+                    <input type="text" id="op-seller" placeholder="UUID del vendedor" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-type">Tipo</label>
+                    <select id="op-type" required>
+                        <option value="">Selecciona tipo</option>
+                        <option value="rent">Alquiler</option>
+                        <option value="sell">Venta</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-price">Precio</label>
+                    <input type="number" id="op-price" placeholder="0.00" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-status">Estado</label>
+                    <select id="op-status" required>
+                        <option value="pending">Pendiente</option>
+                        <option value="in-progress">En Progreso</option>
+                        <option value="completed">Completada</option>
+                        <option value="cancelled">Cancelada</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-notes">Notas</label>
+                    <textarea id="op-notes" placeholder="Notas adicionales" rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    Crear Operación
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Death Squad Airsoft. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+
+        // Verificar autenticación
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+            if (!token) {
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            // Aquí deberías verificar si el usuario es admin
+            return token;
+        }
+
+        const token = checkAuth();
+
+        // Cargar operaciones
+        async function loadOperations() {
+            try {
+                document.getElementById('operaciones-loading').style.display = 'block';
+
+                const response = await fetch(`${API_BASE_URL}/operations/admin/all`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error al cargar operaciones');
+
+                const operations = await response.json();
+                displayOperations(operations);
+                loadStats();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar operaciones');
+            } finally {
+                document.getElementById('operaciones-loading').style.display = 'none';
+            }
+        }
+
+        function displayOperations(operations) {
+            const tbody = document.getElementById('operaciones-body');
+            tbody.innerHTML = '';
+
+            if (operations.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem;">Sin operaciones</td></tr>';
+                return;
+            }
+
+            operations.forEach(op => {
+                const statusClass = `status-${op.status}`;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${op.property_id.substring(0, 8)}...</td>
+                    <td>${op.type === 'rent' ? 'Alquiler' : 'Venta'}</td>
+                    <td>$${parseFloat(op.price).toFixed(2)}</td>
+                    <td><span class="status-badge ${statusClass}">${op.status}</span></td>
+                    <td>
+                        <button class="btn-toggle-active ${op.is_active ? 'active' : 'inactive'}" 
+                                onclick="toggleOperationActive('${op.id}')">
+                            ${op.is_active ? '<i class="fas fa-check-circle"></i> Activa' : '<i class="fas fa-times-circle"></i> Inactiva'}
+                        </button>
+                    </td>
+                    <td>${op.start_date ? new Date(op.start_date).toLocaleDateString() : '-'}</td>
+                    <td>${op.end_date ? new Date(op.end_date).toLocaleDateString() : '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-edit" onclick="editOperation('${op.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="deleteOperation('${op.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Cargar estadísticas
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/admin/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error al cargar estadísticas');
+
+                const stats = await response.json();
+
+                document.getElementById('stat-total').textContent = stats.total;
+                document.getElementById('stat-pending').textContent = stats.by_status.pending;
+                document.getElementById('stat-progress').textContent = stats.by_status['in-progress'];
+                document.getElementById('stat-completed').textContent = stats.by_status.completed;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Modal functions
+        function openNewOperationModal() {
+            document.getElementById('operationModal').style.display = 'block';
+            document.getElementById('operation-form').reset();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function editOperation(id) {
+            alert('Editar operación: ' + id);
+        }
+
+        async function toggleOperationActive(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/${id}/toggle-active`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert(`✓ ${data.message}`);
+                    loadOperations();
+                } else {
+                    alert('Error al cambiar estado');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión');
+            }
+        }
+
+        async function deleteOperation(id) {
+            if (!confirm('¿Estás seguro de que deseas eliminar esta operación?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    alert('Operación eliminada');
+                    loadOperations();
+                } else {
+                    alert('Error al eliminar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Crear operación
+        document.getElementById('operation-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const operationData = {
+                property_id: document.getElementById('op-property').value,
+                seller_id: document.getElementById('op-seller').value,
+                type: document.getElementById('op-type').value,
+                price: document.getElementById('op-price').value,
+                status: document.getElementById('op-status').value,
+                notes: document.getElementById('op-notes').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(operationData)
+                });
+
+                if (response.ok) {
+                    alert('✓ Operación creada correctamente');
+                    closeModal('operationModal');
+                    loadOperations();
+                } else {
+                    const error = await response.json();
+                    alert('❌ Error: ' + (error.error || 'Error desconocido'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión');
+            }
+        });
+
+        // Admin sections
+        document.querySelectorAll('.admin-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                document.querySelectorAll('.admin-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+
+                this.classList.add('active');
+                const section = this.getAttribute('data-section');
+                document.getElementById(`${section}-section`).style.display = 'block';
+
+                if (section === 'estadisticas') {
+                    loadStats();
+                }
+            });
+        });
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        // Cerrar modal al hacer click fuera
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('operationModal');
+            if (e.target === modal) {
+                closeModal('operationModal');
+            }
+        });
+
+        // Cargar al iniciar
+        document.addEventListener('DOMContentLoaded', loadOperations);
+    </script>
+</body>
+</html>

@@ -12,7 +12,7 @@
     <header>
         <div class="logo">
             <i class="fas fa-gun"></i>
-            <span>Death Squad Airsoft</span>
+            <a href="index.html" class="logo-text">Death Squad Airsoft</a>
         </div>
         <button id="menu-toggle" class="menu-toggle" style="display: none;">
             <i class="fas fa-bars"></i>
@@ -132,6 +132,8 @@
     </footer>
 
     <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+
         // MENÚ HAMBURGUESA RESPONSIVO
         const menuToggle = document.getElementById('menu-toggle');
         const navbar = document.getElementById('navbar');
@@ -142,14 +144,51 @@
             });
         }
 
-        // SIMULACIÓN DE REGISTRO
+        // REGISTRO CON BACKEND
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('form');
             if (form) {
-                form.addEventListener('submit', function(e) {
+                form.addEventListener('submit', async function(e) {
                     e.preventDefault();
-                    alert('✓ ¡Registro exitoso! Se ha generado tu código QR único. Redirección a Mi Perfil...');
-                    window.location.href = 'perfil.html';
+
+                    const nombre = document.getElementById('nombre').value.trim();
+                    const email = document.getElementById('email').value.trim();
+                    const telefono = document.getElementById('telefono').value.trim();
+
+                    if (!nombre || !email) {
+                        alert('❌ Por favor, completa todos los campos requeridos');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                name: nombre,
+                                email: email,
+                                password: 'DefaultPassword123!', // El usuario debe cambiar esto
+                                user_type: 'buyer'
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            // Guardar token
+                            localStorage.setItem('token', data.token);
+                            localStorage.setItem('user', JSON.stringify(data.user));
+                            alert('✓ ¡Registro exitoso! Redirección a Mi Perfil...');
+                            window.location.href = 'perfil.html';
+                        } else {
+                            alert(`❌ Error: ${data.error || 'Error desconocido'}`);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('❌ Error de conexión. Asegúrate que el backend está corriendo en http://localhost:5000');
+                    }
                 });
             }
         });
