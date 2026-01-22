@@ -23,8 +23,7 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     properties = db.relationship('Property', backref='owner', lazy=True, foreign_keys='Property.user_id')
-    operations_as_buyer = db.relationship('Operation', foreign_keys='Operation.buyer_id', backref='buyer')
-    operations_as_seller = db.relationship('Operation', foreign_keys='Operation.seller_id', backref='seller')
+    created_operations = db.relationship('Operation', backref='creator_user', lazy=True, foreign_keys='Operation.created_by')
 
     def to_dict(self):
         return {
@@ -95,33 +94,65 @@ class Operation(db.Model):
     __tablename__ = 'operations'
 
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
-    property_id = db.Column(db.String(36), db.ForeignKey('properties.id'), nullable=False)
-    buyer_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
-    seller_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
-    type = db.Column(db.String(20), nullable=False)  # rent, sell
-    price = db.Column(db.Numeric(15, 2), nullable=False)
+    type = db.Column(db.String(50), nullable=False)  # milsim, picado, especial, realista, historica, semi-milsim
+    title = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text)
+    price = db.Column(db.Numeric(15, 2), nullable=False, default=0)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime)
-    status = db.Column(db.String(20), default='pending')  # pending, in-progress, completed, cancelled
-    is_active = db.Column(db.Boolean, default=True)  # Activa o desactivada
+    location = db.Column(db.String(255))
+    max_participants = db.Column(db.Integer)
+    status = db.Column(db.String(20), default='active')  # active, completed, cancelled
+    is_active = db.Column(db.Boolean, default=True)
     notes = db.Column(db.Text)
+    created_by = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    property = db.relationship('Property', backref='operations')
+    creator = db.relationship('User', foreign_keys=[created_by])
+    participations = db.relationship('Participation', backref='operation', lazy=True, cascade='all, delete-orphan')
+
+    def to_dict(self, include_participants=False):
+        data = {
+            'id': self.id,
+            'type': self.type,
+            'title': self.title,
+            'description': self.description,
+            'price': float(self.price),
+            'start_date': self.start_date.isoformat() if self.start_date else None,
+            'end_date': self.end_date.isoformat() if self.end_date else None,
+            'location': self.location,
+            'max_participants': self.max_participants,
+            'status': self.status,
+            'is_active': self.is_active,
+            'notes': self.notes,
+            'created_by': self.created_by,
+            'participant_count': len(self.participations),
+            'created_at': self.created_at.isoformat(),
+        }
+        if include_participants:
+            data['participants'] = [p.to_dict() for p in self.participations]
+        return data
+
+
+class Participation(db.Model):
+    __tablename__ = 'participations'
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    operation_id = db.Column(db.String(36), db.ForeignKey('operations.id'), nullable=False)
+    status = db.Column(db.String(20), default='registered')  # registered, attended, cancelled
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='user_participations')
 
     def to_dict(self):
         return {
             'id': self.id,
-            'property_id': self.property_id,
-            'buyer_id': self.buyer_id,
-            'seller_id': self.seller_id,
-            'type': self.type,
-            'price': float(self.price),
-            'start_date': self.start_date.isoformat() if self.start_date else None,
-            'end_date': self.end_date.isoformat() if self.end_date else None,
+            'user_id': self.user_id,
+            'user_name': self.user.name,
+            'user_email': self.user.email,
+            'operation_id': self.operation_id,
             'status': self.status,
-            'is_active': self.is_active,
-            'notes': self.notes,
-            'created_at': self.created_at.isoformat(),
+            'joined_at': self.joined_at.isoformat(),
         }
