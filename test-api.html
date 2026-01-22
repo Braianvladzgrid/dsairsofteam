@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Test API Backend</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            border: 1px solid #ff6b35;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #2d5016;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #4a7c25;
+        }
+        pre {
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Conexión al Backend</h1>
+    
+    <div class="test-section">
+        <h2>1. Test de Salud (Health Check)</h2>
+        <button onclick="testHealth()">Probar conexión</button>
+        <pre id="health-result"></pre>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test de Login Admin</h2>
+        <button onclick="testLoginAdmin()">Login Admin</button>
+        <pre id="login-admin-result"></pre>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test de Login Usuario Normal</h2>
+        <button onclick="testLoginUser()">Login Usuario</button>
+        <pre id="login-user-result"></pre>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Información de Estado</h2>
+        <pre id="status-info"></pre>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        function updateStatus() {
+            const status = `
+Backend: http://localhost:5000
+API Base: ${API_BASE}
+Frontend: http://localhost:8080
+Timestamp: ${new Date().toISOString()}
+            `;
+            document.getElementById('status-info').textContent = status;
+        }
+
+        async function testHealth() {
+            const resultDiv = document.getElementById('health-result');
+            resultDiv.textContent = 'Conectando...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = `Status: ${response.status}\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testLoginAdmin() {
+            const resultDiv = document.getElementById('login-admin-result');
+            resultDiv.textContent = 'Conectando...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@dsairsofteam.local',
+                        password: 'Admin123!'
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = `Status: ${response.status}\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.textContent = `❌ Error: ${error.message}\n\nVerifica que:\n1. El backend está en http://localhost:5000\n2. El servidor está respondiendo\n3. No hay problemas de CORS`;
+            }
+        }
+
+        async function testLoginUser() {
+            const resultDiv = document.getElementById('login-user-result');
+            resultDiv.textContent = 'Conectando...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test@test.com',
+                        password: 'test123'
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = `Status: ${response.status}\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Ejecutar status al cargar
+        updateStatus();
+    </script>
+</body>
+</html>

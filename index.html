@@ -325,38 +325,33 @@
         loginModal.id = 'loginModal';
         loginModal.className = 'modal';
         loginModal.innerHTML = `
-            <div class="modal-content" style="max-width: 450px; padding: 3rem 2rem;">
-                <button class="modal-close" onclick="closeLoginModal()" style="background: none; border: none; color: var(--accent); font-size: 2rem; cursor: pointer; position: absolute; top: 10px; right: 15px;">&times;</button>
-                <div style="text-align: center; margin-bottom: 2rem;">
-                    <i class="fas fa-user-circle" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem; display: block;"></i>
-                    <h2 style="color: var(--accent); margin-bottom: 0.5rem;">Iniciar Sesión</h2>
-                    <p style="color: var(--gray);">Accede a tu cuenta para participar en operaciones</p>
+            <div class="modal-content" style="width: 380px; padding: 2rem; background: #f5f5f5; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                <button class="modal-close" onclick="closeLoginModal()" style="background: none; border: none; color: #333; font-size: 1.8rem; cursor: pointer; float: right; padding: 0; width: auto; line-height: 1;">&times;</button>
+                <div style="text-align: center; margin-bottom: 1.5rem; clear: both;">
+                    <h2 style="color: #333; margin: 0 0 0.5rem 0; font-size: 1.3rem;">Iniciar Sesión</h2>
+                    <p style="color: #666; font-size: 0.85rem; margin: 0;">Accede a tu cuenta</p>
                 </div>
                 <form id="login-form" onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label for="login-email" style="color: var(--text); font-weight: 500;">Email</label>
-                        <input type="email" id="login-email" placeholder="tu@email.com" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--accent); border-radius: 4px; color: var(--text); font-size: 1rem;">
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="login-email" style="color: #333; font-weight: 500; display: block; margin-bottom: 0.4rem; font-size: 0.9rem;">Email</label>
+                        <input type="email" id="login-email" placeholder="tu@email.com" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; color: #333; font-size: 0.95rem; box-sizing: border-box;">
                     </div>
-                    <div class="form-group">
-                        <label for="login-password" style="color: var(--text); font-weight: 500;">Contraseña</label>
-                        <input type="password" id="login-password" placeholder="Tu contraseña" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--accent); border-radius: 4px; color: var(--text); font-size: 1rem;">
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="login-password" style="color: #333; font-weight: 500; display: block; margin-bottom: 0.4rem; font-size: 0.9rem;">Contraseña</label>
+                        <input type="password" id="login-password" placeholder="Tu contraseña" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; color: #333; font-size: 0.95rem; box-sizing: border-box;">
                     </div>
-                    <div id="login-error" style="color: var(--accent); margin-bottom: 1rem; text-align: center; display: none;"></div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; margin-bottom: 1rem;">
-                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    <div id="login-error" style="color: #d32f2f; margin-bottom: 1rem; text-align: center; display: none; font-size: 0.85rem;"></div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 0.95rem; margin-bottom: 0.5rem; background: #2d5016; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Iniciar Sesión
                     </button>
                 </form>
-                <hr style="border: none; border-top: 1px solid rgba(255,0,110,0.2); margin: 1.5rem 0;">
-                <div style="text-align: center;">
-                    <p style="color: var(--gray); margin-bottom: 1rem;">¿No tienes cuenta?</p>
-                    <a href="registro.html" class="btn btn-secondary" style="width: 100%; padding: 12px; text-decoration: none; display: block;">
-                        <i class="fas fa-user-plus"></i> Registrarse
-                    </a>
+                <div style="text-align: center; font-size: 0.8rem; color: #666;">
+                    <p style="margin: 0.5rem 0;">¿No tienes cuenta? <a href="registro.html" style="color: #2d5016; text-decoration: none; font-weight: 500;">Registrarse</a></p>
                 </div>
-                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,0,110,0.2); font-size: 0.9rem;">
-                    <p style="color: var(--accent); font-weight: bold; margin-bottom: 0.5rem;">Credenciales de Prueba:</p>
-                    <p style="color: var(--gray); margin-bottom: 0.5rem;"><strong>Usuario:</strong> user@example.com / password123</p>
-                    <p style="color: var(--gray);"><strong>Admin:</strong> admin@example.com / admin123</p>
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd; font-size: 0.8rem;">
+                    <p style="color: #666; font-weight: bold; margin: 0 0 0.3rem 0;">Demo:</p>
+                    <p style="color: #666; margin: 0.2rem 0;"><strong>Admin:</strong> admin@dsairsofteam.local / Admin123!</p>
+                    <p style="color: #666; margin: 0.2rem 0;"><strong>Usuario:</strong> test@test.com / test123</p>
                 </div>
             </div>
         `;
@@ -367,9 +362,8 @@
         loginModal.style.left = '0';
         loginModal.style.width = '100%';
         loginModal.style.height = '100%';
-        loginModal.style.background = 'rgba(0,0,0,0.7)';
+        loginModal.style.background = 'rgba(0,0,0,0.5)';
         loginModal.style.zIndex = '9000';
-        loginModal.style.display = 'none';
         loginModal.style.alignItems = 'center';
         loginModal.style.justifyContent = 'center';
         document.body.appendChild(loginModal);
@@ -391,18 +385,28 @@
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
             const errorDiv = document.getElementById('login-error');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
 
             errorDiv.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando...';
 
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+
                 const response = await fetch(`${API_BASE_URL}/auth/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ email, password }),
+                    signal: controller.signal,
+                    credentials: 'include'
                 });
 
+                clearTimeout(timeoutId);
                 const data = await response.json();
 
                 if (response.ok) {
@@ -410,17 +414,23 @@
                     localStorage.setItem('user', JSON.stringify(data.user));
                     closeLoginModal();
                     checkSession();
-                    
-                    // Mostrar popup de bienvenida
                     showWelcomePopup(data.user);
                 } else {
                     errorDiv.textContent = `❌ ${data.error || 'Error de login'}`;
                     errorDiv.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión';
                 }
             } catch (error) {
                 console.error('Error:', error);
-                errorDiv.textContent = '❌ Error de conexión. Asegúrate que el backend está corriendo.';
+                if (error.name === 'AbortError') {
+                    errorDiv.textContent = '❌ Tiempo agotado. Verifica que http://localhost:5000 esté corriendo.';
+                } else {
+                    errorDiv.textContent = '❌ Error de conexión. Asegúrate que el backend está en http://localhost:5000';
+                }
                 errorDiv.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión';
             }
         }
 
@@ -433,23 +443,23 @@
             const welcomeModal = document.createElement('div');
             welcomeModal.className = 'modal';
             welcomeModal.id = 'welcomeModal';
-            welcomeModal.style.display = 'block';
+            welcomeModal.style.display = 'flex';
             welcomeModal.style.zIndex = '9999';
 
             const isAdmin = user.is_admin || false;
             
             welcomeModal.innerHTML = `
-                <div class="modal-content" style="max-width: 500px; text-align: center; padding: 3rem 2rem;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">✓</div>
-                    <h2 style="color: var(--green); margin-bottom: 1rem;">¡Bienvenido ${user.name}!</h2>
-                    <p style="color: var(--gray); margin-bottom: 2rem; font-size: 1.1rem;">
+                <div class="modal-content" style="max-width: 90vw; width: 500px; text-align: center; padding: 2rem 1.5rem;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">✓</div>
+                    <h2 style="color: var(--green); margin-bottom: 0.5rem; font-size: 1.3rem;">¡Bienvenido ${user.name}!</h2>
+                    <p style="color: var(--gray); margin-bottom: 1.5rem; font-size: 0.95rem;">
                         ${isAdmin ? '🔐 Acceso de Administrador Activado' : 'Login exitoso'}
                     </p>
-                    <div style="display: flex; gap: 1rem;">
-                        ${isAdmin ? `<button class="btn btn-primary" onclick="window.location.href='admin-panel.html'" style="flex: 1;">
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        ${isAdmin ? `<button class="btn btn-primary" onclick="window.location.href='admin-panel.html'" style="flex: 1; min-width: 120px;">
                             <i class="fas fa-cog"></i> Panel Admin
                         </button>` : ''}
-                        <button class="btn btn-secondary" onclick="document.getElementById('welcomeModal').remove()" style="flex: 1;">
+                        <button class="btn btn-secondary" onclick="document.getElementById('welcomeModal').remove()" style="flex: 1; min-width: 120px;">
                             <i class="fas fa-arrow-right"></i> Continuar
                         </button>
                     </div>
