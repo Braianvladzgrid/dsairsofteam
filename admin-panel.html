@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Death Squad Airsoft</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-container {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 2rem;
+            margin-top: 6rem;
+            padding: 2rem;
+        }
+
+        .admin-sidebar {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--green) 100%);
+            border-radius: 8px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 6rem;
+        }
+
+        .admin-sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .admin-sidebar a {
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 3px solid transparent;
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-sidebar a:hover,
+        .admin-sidebar a.active {
+            background: var(--accent);
+            color: var(--black);
+            border-left-color: var(--white);
+        }
+
+        .admin-main {
+            background: var(--light-gray);
+            border-radius: 8px;
+        }
+
+        .admin-section {
+            display: none;
+            background: var(--white);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--green);
+            padding-bottom: 1rem;
+        }
+
+        .section-header h2 {
+            color: var(--dark-green);
+            margin: 0;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 1.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+        }
+
+        .data-table th {
+            background: var(--dark-green);
+            color: var(--white);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .data-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .badge-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .badge-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .badge-info {
+            background: #2196F3;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #2196F3;
+        }
+
+        .btn-edit:hover {
+            background: #1976D2;
+        }
+
+        .btn-delete {
+            background: #f44336;
+        }
+
+        .btn-delete:hover {
+            background: #da190b;
+        }
+
+        .btn-toggle {
+            background: #4CAF50;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        .btn-toggle.inactive {
+            background: #ff9800;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--green) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .form-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .form-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-inner {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--green);
+            padding-bottom: 1rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--light-green);
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+                margin-top: 4rem;
+            }
+
+            .admin-sidebar {
+                position: static;
+                display: flex;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .admin-sidebar nav {
+                flex-direction: row;
+                gap: 0;
+                width: 100%;
+            }
+
+            .admin-sidebar a {
+                flex: 1;
+                justify-content: center;
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .table-responsive {
+                font-size: 0.85rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-gun"></i>
+            <a href="index.html" class="logo-text">Death Squad Airsoft</a>
+        </div>
+        <nav id="navbar">
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="perfil.html">Mi Perfil</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <a href="#" onclick="logout()" class="btn btn-secondary">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="admin-container">
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar">
+            <nav>
+                <a href="#" class="admin-link active" data-section="dashboard">
+                    <i class="fas fa-chart-pie"></i> Dashboard
+                </a>
+                <a href="#" class="admin-link" data-section="operaciones">
+                    <i class="fas fa-list"></i> Operaciones
+                </a>
+                <a href="#" class="admin-link" data-section="usuarios">
+                    <i class="fas fa-users"></i> Usuarios
+                </a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="admin-main">
+            <!-- DASHBOARD -->
+            <section id="dashboard" class="admin-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-pie"></i> Dashboard</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>Total Operaciones</h4>
+                        <p class="number" id="stat-total-ops">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Usuarios Registrados</h4>
+                        <p class="number" id="stat-total-users">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Operaciones Activas</h4>
+                        <p class="number" id="stat-active-ops">0</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3>Resumen por Estado</h3>
+                    <div class="stats-grid" style="margin-top: 1rem;">
+                        <div class="stat-card">
+                            <h4>Pendientes</h4>
+                            <p class="number" id="stat-pending">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>En Progreso</h4>
+                            <p class="number" id="stat-progress">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Completadas</h4>
+                            <p class="number" id="stat-completed">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Canceladas</h4>
+                            <p class="number" id="stat-cancelled">0</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- OPERACIONES -->
+            <section id="operaciones" class="admin-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-list"></i> Gestión de Operaciones</h2>
+                    <button class="btn btn-primary" onclick="openOperationForm()">
+                        <i class="fas fa-plus"></i> Nueva Operación
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table" id="operaciones-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tipo</th>
+                                <th>Precio</th>
+                                <th>Estado</th>
+                                <th>Activa</th>
+                                <th>Fecha Inicio</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="operaciones-body">
+                            <tr><td colspan="7" style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="operaciones-empty" class="empty-state" style="display: none;">
+                    <i class="fas fa-inbox"></i>
+                    <p>No hay operaciones registradas</p>
+                </div>
+            </section>
+
+            <!-- USUARIOS -->
+            <section id="usuarios" class="admin-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-users"></i> Gestión de Usuarios</h2>
+                    <button onclick="openUserForm()" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Nuevo Usuario
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table" id="usuarios-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Tipo</th>
+                                <th>Admin</th>
+                                <th>Registrado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usuarios-body">
+                            <tr><td colspan="7" style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="usuarios-empty" class="empty-state" style="display: none;">
+                    <i class="fas fa-inbox"></i>
+                    <p>No hay usuarios registrados</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL OPERACIÓN -->
+    <div id="operationModal" class="form-modal">
+        <div class="modal-inner">
+            <div class="modal-header">
+                <h3>Nueva Operación</h3>
+                <button class="modal-close" onclick="closeOperationForm()">&times;</button>
+            </div>
+            <form id="operation-form">
+                <div class="form-group">
+                    <label for="op-type">Tipo de Operación</label>
+                    <select id="op-type" required>
+                        <option value="">-- Selecciona --</option>
+                        <option value="milsim">Milsim</option>
+                        <option value="picado">Picado</option>
+                        <option value="especial">Operación Especial</option>
+                        <option value="realista">Realista</option>
+                        <option value="historica">Histórica</option>
+                        <option value="semi-milsim">Semi Milsim</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-price">Precio</label>
+                    <input type="number" id="op-price" placeholder="0.00" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-start-date">Fecha de Inicio</label>
+                    <input type="date" id="op-start-date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-status">Estado</label>
+                    <select id="op-status" required>
+                        <option value="pending">Pendiente</option>
+                        <option value="in-progress">En Progreso</option>
+                        <option value="completed">Completada</option>
+                        <option value="cancelled">Cancelada</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-notes">Notas</label>
+                    <textarea id="op-notes" placeholder="Notas adicionales" rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    <i class="fas fa-save"></i> Crear Operación
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL USUARIO -->
+    <div id="userModal" class="form-modal">
+        <div class="modal-inner">
+            <div class="modal-header">
+                <h3 id="userModalTitle">Nuevo Usuario</h3>
+                <button class="modal-close" onclick="closeUserForm()">&times;</button>
+            </div>
+            <form id="user-form">
+                <div class="form-group">
+                    <label for="user-name">Nombre</label>
+                    <input type="text" id="user-name" placeholder="Nombre completo" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="user-email">Email</label>
+                    <input type="email" id="user-email" placeholder="correo@ejemplo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="user-password">Contraseña</label>
+                    <input type="password" id="user-password" placeholder="Contraseña" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="user-phone">Teléfono</label>
+                    <input type="tel" id="user-phone" placeholder="Teléfono">
+                </div>
+
+                <div class="form-group">
+                    <label for="user-type">Tipo de Usuario</label>
+                    <select id="user-type" required>
+                        <option value="buyer">Comprador</option>
+                        <option value="seller">Vendedor</option>
+                        <option value="agent">Agente</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    <i class="fas fa-save"></i> Guardar Usuario
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        // Verificar si es admin
+        if (!token || !user.is_admin) {
+            alert('❌ Acceso denegado. Solo administradores pueden acceder.');
+            window.location.href = 'index.html';
+        }
+
+        // Actualizar header con información de usuario
+        function checkSession() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const authButtons = document.querySelector('.auth-buttons');
+
+            if (token && user.id && authButtons) {
+                authButtons.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 1rem; color: var(--text);">
+                        <span><i class="fas fa-user"></i> ${user.name} ${user.is_admin ? '<span style="color: var(--accent); font-weight: bold;">[ADMIN]</span>' : ''}</span>
+                        <button onclick="logout()" class="btn btn-secondary">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Función para cerrar sesión
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        // Navegación de secciones
+        document.querySelectorAll('.admin-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const section = this.getAttribute('data-section');
+
+                document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.admin-link').forEach(l => l.classList.remove('active'));
+
+                document.getElementById(section).classList.add('active');
+                this.classList.add('active');
+
+                if (section === 'operaciones') {
+                    loadOperations();
+                } else if (section === 'usuarios') {
+                    loadUsers();
+                } else if (section === 'dashboard') {
+                    loadDashboard();
+                }
+            });
+        });
+
+        // DASHBOARD
+        async function loadDashboard() {
+            try {
+                const opsResponse = await fetch(`${API_BASE_URL}/operations/admin/all`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const operations = await opsResponse.json();
+
+                const usersResponse = await fetch(`${API_BASE_URL}/users`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const users = await usersResponse.json();
+
+                // Actualizar estadísticas
+                document.getElementById('stat-total-ops').textContent = operations.length;
+                document.getElementById('stat-total-users').textContent = users.length;
+
+                const activeOps = operations.filter(op => op.is_active).length;
+                document.getElementById('stat-active-ops').textContent = activeOps;
+
+                const pending = operations.filter(op => op.status === 'pending').length;
+                const progress = operations.filter(op => op.status === 'in-progress').length;
+                const completed = operations.filter(op => op.status === 'completed').length;
+                const cancelled = operations.filter(op => op.status === 'cancelled').length;
+
+                document.getElementById('stat-pending').textContent = pending;
+                document.getElementById('stat-progress').textContent = progress;
+                document.getElementById('stat-completed').textContent = completed;
+                document.getElementById('stat-cancelled').textContent = cancelled;
+            } catch (error) {
+                console.error('Error cargando dashboard:', error);
+            }
+        }
+
+        // OPERACIONES
+        async function loadOperations() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/admin/all`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const operations = await response.json();
+
+                const tbody = document.getElementById('operaciones-body');
+                tbody.innerHTML = '';
+
+                if (operations.length === 0) {
+                    document.getElementById('operaciones-empty').style.display = 'block';
+                    tbody.innerHTML = '<tr><td colspan="7"></td></tr>';
+                    return;
+                }
+
+                document.getElementById('operaciones-empty').style.display = 'none';
+
+                operations.forEach(op => {
+                    const row = document.createElement('tr');
+                    const statusColor = op.status === 'completed' ? 'success' : op.status === 'pending' ? 'warning' : 'info';
+                    const activeBadge = op.is_active ? '<span class="badge badge-success">✓ Activa</span>' : '<span class="badge badge-danger">✗ Inactiva</span>';
+
+                    row.innerHTML = `
+                        <td>${op.id.substring(0, 8)}...</td>
+                        <td>${op.type === 'rent' ? '🏠 Alquiler' : '🏡 Venta'}</td>
+                        <td>$${op.price}</td>
+                        <td><span class="badge badge-${statusColor}">${op.status}</span></td>
+                        <td>${activeBadge}</td>
+                        <td>${new Date(op.start_date).toLocaleDateString('es-AR')}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-small btn-toggle ${op.is_active ? '' : 'inactive'}" onclick="toggleOperation('${op.id}')">
+                                    ${op.is_active ? '▼' : '▲'} Toggle
+                                </button>
+                                <button class="btn-small btn-delete" onclick="deleteOperation('${op.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error cargando operaciones:', error);
+            }
+        }
+
+        // USUARIOS
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const users = await response.json();
+
+                const tbody = document.getElementById('usuarios-body');
+                tbody.innerHTML = '';
+
+                if (users.length === 0) {
+                    document.getElementById('usuarios-empty').style.display = 'block';
+                    tbody.innerHTML = '<tr><td colspan="7"></td></tr>';
+                    return;
+                }
+
+                document.getElementById('usuarios-empty').style.display = 'none';
+
+                users.forEach(u => {
+                    const row = document.createElement('tr');
+                    const adminBadge = u.is_admin ? '<span class="badge badge-danger">Admin</span>' : '<span class="badge badge-info">User</span>';
+
+                    row.innerHTML = `
+                        <td>${u.name}</td>
+                        <td>${u.email}</td>
+                        <td>${u.phone || '-'}</td>
+                        <td>${u.user_type || '-'}</td>
+                        <td>${adminBadge}</td>
+                        <td>${new Date(u.created_at).toLocaleDateString('es-AR')}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-small btn-edit" onclick="editUser('${u.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-small btn-delete" onclick="deleteUser('${u.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error cargando usuarios:', error);
+            }
+        }
+
+
+        // FUNCIONES DE OPERACIONES
+        function openOperationForm() {
+            document.getElementById('operationModal').classList.add('active');
+        }
+
+        function closeOperationForm() {
+            document.getElementById('operationModal').classList.remove('active');
+        }
+
+        async function toggleOperation(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/${id}/toggle-active`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    alert('✓ Operación actualizada');
+                    loadOperations();
+                } else {
+                    alert('❌ Error al actualizar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function deleteOperation(id) {
+            if (!confirm('¿Eliminar esta operación?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    alert('✓ Operación eliminada');
+                    loadOperations();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        document.getElementById('operation-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const operationData = {
+                type: document.getElementById('op-type').value,
+                price: document.getElementById('op-price').value,
+                start_date: document.getElementById('op-start-date').value,
+                status: document.getElementById('op-status').value,
+                notes: document.getElementById('op-notes').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(operationData)
+                });
+
+                if (response.ok) {
+                    alert('✓ Operación creada');
+                    closeOperationForm();
+                    document.getElementById('operation-form').reset();
+                    loadOperations();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        // FUNCIONES DE PROPIEDADES
+        // FUNCIONES DE USUARIOS
+        function openUserForm() {
+            document.getElementById('userModal').classList.add('active');
+            document.getElementById('userModalTitle').textContent = 'Nuevo Usuario';
+            document.getElementById('user-form').reset();
+            document.getElementById('user-form').removeAttribute('data-edit-id');
+            document.getElementById('user-password').required = true;
+        }
+
+        function closeUserForm() {
+            document.getElementById('userModal').classList.remove('active');
+            document.getElementById('user-form').reset();
+            document.getElementById('user-form').removeAttribute('data-edit-id');
+        }
+
+        async function editUser(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    alert('Error al cargar usuario');
+                    return;
+                }
+
+                const user = await response.json();
+
+                // Abrir modal
+                document.getElementById('userModal').classList.add('active');
+                document.getElementById('userModalTitle').textContent = 'Editar Usuario';
+
+                // Llenar form
+                document.getElementById('user-name').value = user.name;
+                document.getElementById('user-email').value = user.email;
+                document.getElementById('user-phone').value = user.phone || '';
+                document.getElementById('user-type').value = user.user_type || 'buyer';
+
+                // Marcar que es edición
+                document.getElementById('user-form').setAttribute('data-edit-id', id);
+
+                // Hacer contraseña opcional para edición
+                document.getElementById('user-password').required = false;
+                document.getElementById('user-password').value = '';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar usuario');
+            }
+        }
+
+        async function deleteUser(id) {
+            if (!confirm('¿Eliminar este usuario?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    alert('✓ Usuario eliminado');
+                    loadUsers();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        document.getElementById('user-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const editId = document.getElementById('user-form').getAttribute('data-edit-id');
+            const userData = {
+                name: document.getElementById('user-name').value,
+                email: document.getElementById('user-email').value,
+                phone: document.getElementById('user-phone').value,
+                user_type: document.getElementById('user-type').value
+            };
+
+            // Agregar contraseña solo si se proporciona
+            const password = document.getElementById('user-password').value;
+            if (password) {
+                userData.password = password;
+            }
+
+            try {
+                const url = editId ? `${API_BASE_URL}/users/${editId}` : `${API_BASE_URL}/users`;
+                const method = editId ? 'PATCH' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    alert(editId ? '✓ Usuario actualizado' : '✓ Usuario creado');
+                    closeUserForm();
+                    loadUsers();
+                } else {
+                    alert('❌ Error al guardar usuario');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al guardar usuario');
+            }
+        });
+
+        // LOGOUT
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        // CERRAR MODALES AL HACER CLICK FUERA
+        window.addEventListener('click', (e) => {
+            if (e.target.id === 'operationModal') {
+                closeOperationForm();
+            }
+            if (e.target.id === 'userModal') {
+                closeUserForm();
+            }
+        });
+
+        // Cargar dashboard al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            checkSession();
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>

@@ -198,8 +198,8 @@
                 <li><a href="perfil.html">Mi Perfil</a></li>
             </ul>
             <div class="auth-buttons">
-                <button class="btn btn-secondary">Iniciar Sesión</button>
-                <button class="btn btn-primary" onclick="window.location.href='registro.html'">Registrarse</button>
+                <button class="btn btn-secondary" onclick="showLoginModal()">Iniciar Sesión</button>
+                <a href="registro.html" class="btn btn-primary">Registrarse</a>
             </div>
         </nav>
     </header>
@@ -312,6 +312,40 @@
     </footer>
 
     <script>
+        // Actualizar header con información de usuario
+        function checkSession() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const authButtons = document.querySelector('.auth-buttons');
+
+            if (token && user.id) {
+                let adminLink = '';
+                if (user.is_admin) {
+                    adminLink = `<a href="admin-panel.html" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-cog"></i> Dashboard
+                    </a>`;
+                }
+                
+                if (authButtons) {
+                    authButtons.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 1rem; color: var(--text);">
+                            <span><i class="fas fa-user"></i> ${user.name} ${user.is_admin ? '<span style="color: var(--accent); font-weight: bold;">[ADMIN]</span>' : ''}</span>
+                            ${adminLink}
+                            <button onclick="logout()" class="btn btn-secondary">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
         // BASE DE DATOS DE OPERACIONES
         const operaciones = {
             'OP-2026-001': {
@@ -487,6 +521,7 @@
 
         // INICIALIZAR
         document.addEventListener('DOMContentLoaded', function() {
+            checkSession();
             cargarOperacion();
             mostrarEstadoInscripcion();
         });

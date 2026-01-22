@@ -1,0 +1,181 @@
+🚀 QUICK START - 3 PASOS PARA PROBAR TODO
+
+═══════════════════════════════════════════════════════════════════════════════
+
+PASO 1️⃣: ABRE EL NAVEGADOR
+═══════════════════════════════════════════════════════════════════════════════
+
+URL: http://localhost:8080/index.html
+
+(Los servidores ya están corriendo en background)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+PASO 2️⃣: HAZ LOGIN CON CREDENCIALES ADMIN
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Haz clic en botón "Iniciar Sesión" (esquina superior derecha)
+2. Ingresa:
+   📧 Email:    admin@dsairsofteam.local
+   🔐 Password: Admin123!
+3. Haz clic en "Iniciar Sesión"
+
+═══════════════════════════════════════════════════════════════════════════════
+
+PASO 3️⃣: VE EL POPUP Y ACCEDE AL PANEL ADMIN
+═══════════════════════════════════════════════════════════════════════════════
+
+✓ Popup aparece automáticamente mostrando:
+  • ✓ (checkmark grande)
+  • "¡Bienvenido Admin!"
+  • "🔐 Acceso de Administrador Activado"
+  • Botón "Panel Admin"
+
+✓ Haz clic en "Panel Admin"
+  → Te lleva a admin-panel.html
+
+═══════════════════════════════════════════════════════════════════════════════
+
+LISTO! ESTÁS EN EL PANEL ADMIN
+═══════════════════════════════════════════════════════════════════════════════
+
+Ahora puedes:
+
+📊 DASHBOARD (primera sección)
+   • Ver estadísticas en tiempo real
+   • Total de operaciones, usuarios, propiedades
+   • Desglose por estado
+
+📋 OPERACIONES (segunda sección)
+   • Ver todas las operaciones
+   • ➕ Crear nueva (botón verde)
+   • 🔘 Togglear estado activo/inactivo
+   • 🗑️ Eliminar
+
+👥 USUARIOS (tercera sección)
+   • Ver lista de todos los usuarios registrados
+   • 🗑️ Eliminar usuario (con confirmación)
+
+🏠 PROPIEDADES (cuarta sección)
+   • Ver lista de propiedades
+   • ➕ Crear nueva
+   • 🗑️ Eliminar
+
+═══════════════════════════════════════════════════════════════════════════════
+
+¿QUIERES CREAR UN REGISTRO NUEVO?
+
+CREAR OPERACIÓN:
+1. Haz clic en "Operaciones"
+2. Haz clic en botón "➕ Nueva Operación"
+3. Completa el formulario:
+   • Tipo: Alquiler o Venta
+   • Precio: número
+   • Fecha de inicio: selecciona fecha
+   • Estado: Pendiente/En Progreso/Completada/Cancelada
+   • Notas: (opcional)
+4. Haz clic en "Crear Operación"
+5. ✓ Listo! Aparece en la tabla
+
+CREAR PROPIEDAD:
+1. Haz clic en "Propiedades"
+2. Haz clic en botón "➕ Nueva Propiedad"
+3. Completa el formulario:
+   • Título: nombre de la propiedad
+   • Tipo: apartment, house, land, commercial
+   • Precio: número
+   • Tipo de Operación: Alquiler o Venta
+4. Haz clic en "Crear Propiedad"
+5. ✓ Listo! Aparece en la tabla
+
+═══════════════════════════════════════════════════════════════════════════════
+
+¿QUIERES ELIMINAR UN REGISTRO?
+
+CUALQUIER SECCIÓN:
+1. Busca el registro en la tabla
+2. Haz clic en botón 🗑️ (papelera roja)
+3. Confirma: "¿Está seguro?"
+4. ✓ Eliminado!
+
+NOTA: No se puede recuperar lo eliminado
+
+═══════════════════════════════════════════════════════════════════════════════
+
+¿QUIERES VER ESTADÍSTICAS?
+
+1. Haz clic en "Dashboard" (primera opción)
+2. Verás 8 tarjetas con números:
+   • Total de operaciones
+   • Total de usuarios
+   • Total de propiedades
+   • Operaciones activas
+   • Pendientes / En progreso / Completadas / Canceladas
+3. Los números se actualizan automáticamente
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TOGGLEAR ESTADO DE OPERACIÓN
+
+1. Ve a "Operaciones"
+2. Busca la operación en la tabla
+3. Haz clic en botón "▼ Toggle" o "▲ Toggle"
+4. ¡Cambia de activa a inactiva (o viceversa)!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+CERRAR SESIÓN
+
+1. En cualquier página, haz clic en "Cerrar Sesión"
+   (en la barra de navegación superior)
+2. Vuelves al login
+
+═══════════════════════════════════════════════════════════════════════════════
+
+CARACTERÍSTICAS ESPECIALES
+
+✅ Los datos se actualizan en tiempo real desde la BD
+✅ Diseño responsive (funciona en mobile, tablet, desktop)
+✅ Colores consistentes (tema verde de Death Squad Airsoft)
+✅ Iconos Font Awesome en todos los botones
+✅ Confirmación antes de eliminar
+✅ Formularios validados en backend
+✅ Token JWT por 7 días
+
+═══════════════════════════════════════════════════════════════════════════════
+
+DOCUMENTACIÓN ADICIONAL
+
+Si quieres más detalles, lee estos archivos:
+
+📖 ADMIN_PANEL_GUIDE.md
+   → Guía detallada de cada función
+   → Incluye toda la documentación
+
+📖 SISTEMA_OPERATIVO.txt
+   → Verificación de que todo funciona
+   → Lista de endpoints disponibles
+
+📖 IMPLEMENTACION_ADMIN_PANEL.md
+   → Resumen técnico de lo implementado
+   → Cambios en backend y frontend
+
+═══════════════════════════════════════════════════════════════════════════════
+
+¿ENCONTRASTE UN ERROR?
+
+1. Verifica que el backend está corriendo: http://localhost:5000/api/health
+2. Verifica que el frontend carga: http://localhost:8080/index.html
+3. Verifica que eres admin: el popup debe mostrar "🔐 Acceso de Administrador"
+4. Prueba desde una pestaña nueva (incógnito)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎉 ¡LISTO PARA USAR!
+
+El sistema está completamente funcional.
+Puedes probar todas las funciones sin preocuparte.
+
+¡Diviértete probando el panel admin! 🚀
+
+═══════════════════════════════════════════════════════════════════════════════

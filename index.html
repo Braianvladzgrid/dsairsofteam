@@ -84,7 +84,7 @@
     <main>
         <!-- SECCIÓN INICIO / HERO -->
         <section id="inicio" class="hero">
-            <h1>Death Squad Airsoft</h1>
+            <h1>Death Squad Airsoft Team</h1>
             <p>¡Regístrate y participá en nuestras operaciones tácticas!</p>
             <div class="hero-buttons">
                 <a href="registro.html" class="btn btn-primary">
@@ -199,13 +199,29 @@
             if (token && user.id) {
                 // Usuario autenticado
                 if (authButtons) {
+                    let adminLink = '';
+                    if (user.is_admin) {
+                        adminLink = `<a href="admin-panel.html" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-cog"></i> Dashboard
+                        </a>`;
+                    }
+                    
                     authButtons.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 1rem; color: var(--text);">
-                            <span><i class="fas fa-user"></i> ${user.name}</span>
+                            <span><i class="fas fa-user"></i> ${user.name} ${user.is_admin ? '<span style="color: var(--accent); font-weight: bold;">[ADMIN]</span>' : ''}</span>
+                            ${adminLink}
                             <button onclick="logout()" class="btn btn-secondary">
                                 <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                             </button>
                         </div>
+                    `;
+                }
+            } else {
+                // Usuario NO autenticado - mostrar botones de login y registro
+                if (authButtons) {
+                    authButtons.innerHTML = `
+                        <button class="btn btn-secondary" onclick="openLoginModal()">Iniciar Sesión</button>
+                        <a href="registro.html" class="btn btn-primary">Registrarse</a>
                     `;
                 }
             }
@@ -318,11 +334,11 @@
         document.body.appendChild(loginModal);
 
         function openLoginModal() {
-            document.getElementById('loginModal').style.display = 'block';
+            document.getElementById('loginModal').classList.add('active');
         }
 
         function closeLoginModal() {
-            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('loginModal').classList.remove('active');
         }
 
         // Manejar login
@@ -346,10 +362,11 @@
                 if (response.ok) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    alert('✓ ¡Bienvenido!');
                     closeLoginModal();
                     checkSession();
-                    window.location.href = 'perfil.html';
+                    
+                    // Mostrar popup de bienvenida
+                    showWelcomePopup(data.user);
                 } else {
                     alert(`❌ Error: ${data.error || 'Error desconocido'}`);
                 }
@@ -364,6 +381,56 @@
         if (loginBtn) {
             loginBtn.addEventListener('click', openLoginModal);
         }
+
+        // Popup de bienvenida
+        function showWelcomePopup(user) {
+            const welcomeModal = document.createElement('div');
+            welcomeModal.className = 'modal';
+            welcomeModal.id = 'welcomeModal';
+            welcomeModal.style.display = 'block';
+            welcomeModal.style.zIndex = '9999';
+
+            const isAdmin = user.is_admin || false;
+            
+            welcomeModal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px; text-align: center; padding: 3rem 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">✓</div>
+                    <h2 style="color: var(--green); margin-bottom: 1rem;">¡Bienvenido ${user.name}!</h2>
+                    <p style="color: var(--gray); margin-bottom: 2rem; font-size: 1.1rem;">
+                        ${isAdmin ? '🔐 Acceso de Administrador Activado' : 'Login exitoso'}
+                    </p>
+                    <div style="display: flex; gap: 1rem;">
+                        ${isAdmin ? `<button class="btn btn-primary" onclick="window.location.href='admin-panel.html'" style="flex: 1;">
+                            <i class="fas fa-cog"></i> Panel Admin
+                        </button>` : ''}
+                        <button class="btn btn-secondary" onclick="document.getElementById('welcomeModal').remove()" style="flex: 1;">
+                            <i class="fas fa-arrow-right"></i> Continuar
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(welcomeModal);
+
+            // Cerrar al hacer click fuera
+            welcomeModal.addEventListener('click', function(e) {
+                if (e.target === welcomeModal) {
+                    welcomeModal.remove();
+                }
+            });
+
+            // Cerrar automáticamente después de 3 segundos si no es admin
+            if (!isAdmin) {
+                setTimeout(function() {
+                    if (welcomeModal.parentElement) {
+                        welcomeModal.remove();
+                        window.location.href = 'perfil.html';
+                    }
+                }, 3000);
+            }
+        }
+
+        // Botón iniciar sesión
 
         // DROPDOWN RESPONSIVO
         document.addEventListener('click', function(e) {
@@ -393,7 +460,7 @@
         // Cerrar modal al hacer click fuera
         window.addEventListener('click', function(e) {
             if (e.target === loginModal) {
-                closeLoginModal();
+                loginModal.classList.remove('active');
             }
         });
 

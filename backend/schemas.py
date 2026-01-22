@@ -8,7 +8,8 @@ class UserRegisterSchema(Schema):
     name = fields.String(required=True, validate=validate.Length(min=2, max=255))
     email = fields.Email(required=True)
     password = fields.String(required=True, validate=validate.Length(min=6))
-    user_type = fields.String(validate=validate.OneOf(['buyer', 'seller', 'agent']))
+    phone = fields.String(validate=validate.Length(max=20))
+    user_type = fields.String(validate=validate.OneOf(['buyer', 'seller', 'agent', 'player']))
 
 class UserLoginSchema(Schema):
     email = fields.Email(required=True)

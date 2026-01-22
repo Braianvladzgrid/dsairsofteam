@@ -1,0 +1,97 @@
+✅ SISTEMA DE LOGIN - COMPLETAMENTE FUNCIONAL
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🌐 ACCEDE AQUÍ:
+  ➜ http://localhost:8080/index.html   (Interfaz Frontend)
+  ➜ http://localhost:5000/api/health   (Backend Health Check)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+👤 CREDENCIALES DE PRUEBA (Admin):
+  📧 Email:    admin@dsairsofteam.local
+  🔐 Password: Admin123!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 PASOS PARA PROBAR:
+
+1. Abre http://localhost:8080/index.html
+2. Haz clic en "Iniciar Sesión" (botón gris en la esquina superior derecha)
+3. Ingresa:
+   - Email: admin@dsairsofteam.local
+   - Contraseña: Admin123!
+4. Haz clic en "Iniciar Sesión"
+5. ✅ Deberías ver:
+   - Token guardado en localStorage
+   - Usuario guardado en localStorage
+   - Redirección a perfil.html
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎨 DROPDOWN MEJORADO:
+
+Los selectores <select> ahora tienen:
+  ✅ Fondo blanco con bordes verdes
+  ✅ Icono dropdown personalizado
+  ✅ Efecto hover suave
+  ✅ Opciones con fondo verde cuando están seleccionadas
+  ✅ Menú de navegación fijo al pasar el mouse
+
+Prueba en: http://localhost:8080/alquiler.html
+
+═══════════════════════════════════════════════════════════════════════════════
+
+⚙️ SERVIDORES ACTIVOS:
+
+[✓] Backend Flask         - http://localhost:5000
+    └─ Endpoints: /api/auth/login, /api/operations/*, etc.
+    
+[✓] Frontend Web Server   - http://localhost:8080
+    └─ Sirve archivos HTML, CSS, JavaScript
+    
+[✓] Base de Datos SQLite  - backend/dsairsofteam.db
+    └─ Usuario admin precargado
+    └─ Tablas: users, properties, operations
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📝 PRUEBAS ADICIONALES:
+
+Crear nuevo usuario (registro):
+$ curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "Test123!",
+    "user_type": "buyer"
+  }'
+
+Verificar login vía API:
+$ curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@dsairsofteam.local","password":"Admin123!"}'
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✨ CARACTERÍSTICAS COMPLETADAS:
+
+[✓] Autenticación JWT con token de 7 días
+[✓] Registro de nuevos usuarios
+[✓] Login con email y contraseña
+[✓] Dropdown HTML mejorado visualmente
+[✓] Base de datos SQLite inicializada
+[✓] CORS habilitado para desarrollo
+[✓] Validación de inputs (Marshmallow)
+[✓] Protección XSS (Bleach)
+[✓] Contraseñas hasheadas (werkzeug)
+[✓] Menú navegación con hover fijo
+[✓] Redirección post-login a perfil.html
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTACIÓN COMPLETA:
+Ver GUIA_LOGIN.md para más detalles y troubleshooting
+
+═══════════════════════════════════════════════════════════════════════════════

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from models import Property, db
-from routes.auth import token_required
+from routes.auth import token_required, admin_required
 from schemas import sanitize_input, PropertySchema
 from sqlalchemy import or_
 
@@ -106,7 +106,8 @@ def delete_property(current_user, id):
     if not property:
         return jsonify({'error': 'Property not found'}), 404
 
-    if property.user_id != current_user.id:
+    # Permitir si es el dueño o si es admin
+    if property.user_id != current_user.id and not current_user.is_admin:
         return jsonify({'error': 'Not authorized'}), 403
 
     db.session.delete(property)

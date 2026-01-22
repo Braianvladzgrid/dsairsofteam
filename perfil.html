@@ -38,8 +38,8 @@
                 <li><a href="perfil.html">Mi Perfil</a></li>
             </ul>
             <div class="auth-buttons">
-                <button class="btn btn-secondary">Iniciar Sesión</button>
-                <button class="btn btn-primary" onclick="window.location.href='registro.html'">Registrarse</button>
+                <button class="btn btn-secondary" onclick="showLoginModal()">Iniciar Sesión</button>
+                <a href="registro.html" class="btn btn-primary">Registrarse</a>
             </div>
         </nav>
     </header>
@@ -51,63 +51,27 @@
             <div class="profile-container">
                 <!-- TARJETA DE PERFIL -->
                 <div class="profile-card">
-                    <div class="avatar">
-                        <i class="fas fa-user"></i>
+                    <div class="avatar" id="avatarContainer" style="position: relative;">
+                        <img id="userPhoto" src="" alt="Foto" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: none;">
+                        <i class="fas fa-user" id="userIcon"></i>
+                        <input type="file" id="photoInput" accept="image/*" style="display: none;">
+                        <button onclick="document.getElementById('photoInput').click()" class="btn btn-small" style="position: absolute; bottom: 0; right: 0; padding: 0.5rem;">
+                            <i class="fas fa-camera"></i>
+                        </button>
                     </div>
-                    <h3>Juan Peláez</h3>
-                    <span class="status-badge status-active">Registrado</span>
+                    <h3 id="userName">Cargando...</h3>
+                    <span class="status-badge status-active" id="userStatus">Registrado</span>
                 </div>
 
                 <!-- INFORMACIÓN DEL PERFIL -->
-                <div class="profile-info">
-                    <div class="info-row">
-                        <span class="label-info">Nombre Completo:</span>
-                        <span>Juan Peláez García</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label-info">Documento:</span>
-                        <span>12.345.678-9</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label-info">Nickname:</span>
-                        <span>ShadowTactician</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label-info">Email:</span>
-                        <span>juan@example.com</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label-info">Teléfono:</span>
-                        <span>+598 9 1234 5678</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label-info">Equipo:</span>
-                        <span>Death Squad</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label-info">Operaciones Participadas:</span>
-                        <span><strong>5</strong></span>
-                    </div>
+                <div class="profile-info" id="profileInfo">
+                    <!-- Se cargará dinámicamente con JavaScript -->
+                </div>
 
-                    <!-- CÓDIGO QR -->
-                    <div class="qr-section">
-                        <h4>Tu Código QR Único</h4>
-                        <p style="font-size: 0.9rem; margin: 0.5rem 0;">Presenta este código en los eventos para identificación rápida</p>
-                        <div class="qr-code">
-                            <div style="background: var(--light-green); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 4px;">
-                                <span style="font-size: 0.8rem; text-align: center;">🔗 QR<br>ID: JST-2026-00847</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;">
-                            <i class="fas fa-download"></i> Descargar QR
-                        </button>
-                    </div>
-
-                    <div style="margin-top: 2rem;">
-                        <a href="index.html" class="btn btn-primary" style="width: 100%; padding: 1rem; text-align: center;">
-                            <i class="fas fa-arrow-left"></i> Volver al Inicio
-                        </a>
-                    </div>
+                <div style="margin-top: 2rem;">
+                    <a href="index.html" class="btn btn-primary" style="width: 100%; padding: 1rem; text-align: center;">
+                        <i class="fas fa-arrow-left"></i> Volver al Inicio
+                    </a>
                 </div>
             </div>
         </section>
@@ -124,6 +88,40 @@
     </footer>
 
     <script>
+        // Actualizar header con información de usuario
+        function checkSession() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const authButtons = document.querySelector('.auth-buttons');
+
+            if (token && user.id) {
+                let adminLink = '';
+                if (user.is_admin) {
+                    adminLink = `<a href="admin-panel.html" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-cog"></i> Dashboard
+                    </a>`;
+                }
+                
+                if (authButtons) {
+                    authButtons.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 1rem; color: var(--text);">
+                            <span><i class="fas fa-user"></i> ${user.name} ${user.is_admin ? '<span style="color: var(--accent); font-weight: bold;">[ADMIN]</span>' : ''}</span>
+                            ${adminLink}
+                            <button onclick="logout()" class="btn btn-secondary">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
         // MENÚ HAMBURGUESA RESPONSIVO
         const menuToggle = document.getElementById('menu-toggle');
         const navbar = document.getElementById('navbar');
@@ -154,6 +152,216 @@
                 if (navbar) navbar.classList.remove('active');
                 document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
             }
+        });
+
+        const API_BASE_URL = 'http://localhost:5000/api';
+        let isEditing = false;
+        let currentUser = null;
+
+        // Cargar datos del perfil
+        async function loadProfile() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+            if (!token || !user.id) {
+                alert('❌ Debes iniciar sesión para ver tu perfil');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            currentUser = user;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${user.id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    currentUser = userData;
+
+                    // Mostrar nombre
+                    document.getElementById('userName').textContent = userData.name;
+
+                    // Mostrar foto si existe
+                    if (userData.photo) {
+                        document.getElementById('userPhoto').src = userData.photo;
+                        document.getElementById('userPhoto').style.display = 'block';
+                        document.getElementById('userIcon').style.display = 'none';
+                    }
+
+                    // Cargar información editable
+                    renderProfileInfo();
+                } else {
+                    alert('Error al cargar perfil');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión');
+            }
+        }
+
+        function renderProfileInfo() {
+            const profileInfo = document.getElementById('profileInfo');
+            const token = localStorage.getItem('token');
+
+            if (isEditing) {
+                // Modo edición
+                profileInfo.innerHTML = `
+                    <form id="editForm" style="margin-bottom: 1.5rem;">
+                        <div class="info-row" style="margin-bottom: 1rem;">
+                            <label class="label-info">Nombre Completo:</label>
+                            <input type="text" id="editName" value="${currentUser.name}" class="form-input" required>
+                        </div>
+                        <div class="info-row" style="margin-bottom: 1rem;">
+                            <label class="label-info">Teléfono:</label>
+                            <input type="tel" id="editPhone" value="${currentUser.phone || ''}" class="form-input">
+                        </div>
+                        <div class="info-row" style="margin-bottom: 1rem;">
+                            <label class="label-info">Email:</label>
+                            <input type="email" id="editEmail" value="${currentUser.email}" class="form-input" disabled style="background: #f0f0f0; cursor: not-allowed;">
+                            <small style="color: #666; margin-top: 0.25rem;">No se puede cambiar el email</small>
+                        </div>
+                        <div class="info-row" style="margin-bottom: 1rem;">
+                            <label class="label-info">Documento (Cédula):</label>
+                            <input type="text" value="${currentUser.document || 'No ingresado'}" class="form-input" disabled style="background: #f0f0f0; cursor: not-allowed;">
+                            <small style="color: #666; margin-top: 0.25rem;">No se puede modificar</small>
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-primary" onclick="saveProfile(event)">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelEdit()">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </form>
+                `;
+            } else {
+                // Modo lectura
+                profileInfo.innerHTML = `
+                    <div class="info-row">
+                        <span class="label-info">Nombre Completo:</span>
+                        <span>${currentUser.name}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label-info">Email:</span>
+                        <span>${currentUser.email}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label-info">Teléfono:</span>
+                        <span>${currentUser.phone || 'No ingresado'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label-info">Documento (Cédula):</span>
+                        <span>${currentUser.document || 'No ingresado'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label-info">Tipo de Usuario:</span>
+                        <span>${currentUser.user_type || 'Jugador'}</span>
+                    </div>
+                    <button onclick="startEdit()" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">
+                        <i class="fas fa-edit"></i> Editar Perfil
+                    </button>
+                `;
+            }
+        }
+
+        function startEdit() {
+            isEditing = true;
+            renderProfileInfo();
+        }
+
+        function cancelEdit() {
+            isEditing = false;
+            renderProfileInfo();
+        }
+
+        async function saveProfile(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('token');
+
+            const updatedData = {
+                name: document.getElementById('editName').value,
+                phone: document.getElementById('editPhone').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${currentUser.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (response.ok) {
+                    const updatedUser = await response.json();
+                    currentUser = updatedUser.user || updatedUser;
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    alert('✓ Perfil actualizado exitosamente');
+                    isEditing = false;
+                    renderProfileInfo();
+                } else {
+                    alert('❌ Error al actualizar perfil');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión');
+            }
+        }
+
+        // Manejo de foto
+        function setupPhotoUpload() {
+            const photoInput = document.getElementById('photoInput');
+            
+            photoInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Validar que sea imagen
+                if (!file.type.startsWith('image/')) {
+                    alert('❌ Por favor selecciona una imagen válida');
+                    return;
+                }
+
+                // Convertir a base64
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const base64Image = event.target.result;
+                    const token = localStorage.getItem('token');
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/users/${currentUser.id}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ photo: base64Image })
+                        });
+
+                        if (response.ok) {
+                            document.getElementById('userPhoto').src = base64Image;
+                            document.getElementById('userPhoto').style.display = 'block';
+                            document.getElementById('userIcon').style.display = 'none';
+                            alert('✓ Foto actualizada');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Error al subir foto');
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Ejecutar cuando carga la página
+        document.addEventListener('DOMContentLoaded', () => {
+            setupPhotoUpload();
+            loadProfile();
+            checkSession();
         });
     </script>
 </body>

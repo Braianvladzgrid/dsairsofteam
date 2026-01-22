@@ -12,6 +12,7 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     phone = db.Column(db.String(20))
+    photo = db.Column(db.Text)  # Base64 encoded image
     address = db.Column(db.String(255))
     city = db.Column(db.String(100))
     state = db.Column(db.String(100))
@@ -31,6 +32,7 @@ class User(db.Model):
             'name': self.name,
             'email': self.email,
             'phone': self.phone,
+            'photo': self.photo,
             'address': self.address,
             'city': self.city,
             'state': self.state,

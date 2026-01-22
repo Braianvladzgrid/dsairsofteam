@@ -61,6 +61,7 @@ def register():
         name=validated_data['name'],
         email=validated_data['email'],
         password=generate_password_hash(validated_data['password']),
+        phone=validated_data.get('phone', ''),
         user_type=validated_data.get('user_type', 'buyer'),
         is_admin=False
     )

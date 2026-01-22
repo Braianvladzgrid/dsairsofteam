@@ -1,0 +1,159 @@
+🎉 SISTEMA ADMIN PANEL - RESUMEN DE CAMBIOS
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✨ NUEVAS CARACTERÍSTICAS:
+
+1. 🎊 POPUP DE BIENVENIDA
+   • Aparece automáticamente después del login
+   • Mostrador de ✓ o 🔐 según tipo de usuario
+   • Redirige automáticamente al panel admin
+
+2. 📊 DASHBOARD COMPLETO
+   • 4 tarjetas de estadísticas principales
+   • 4 tarjetas de desglose por estado
+   • Todo en tiempo real desde la BD
+
+3. 👥 GESTIÓN DE USUARIOS
+   • Ver todos los usuarios registrados
+   • Información: nombre, email, teléfono, tipo, rol
+   • Eliminar usuarios (con confirmación)
+   • Endpoint nuevo: GET /api/users
+
+4. 📋 GESTIÓN DE OPERACIONES
+   • Ver todas las operaciones
+   • Crear nuevas operaciones (modal)
+   • Togglear estado activo/inactivo
+   • Eliminar operaciones
+   • Estados con colores
+
+5. 🏠 GESTIÓN DE PROPIEDADES
+   • Ver todas las propiedades
+   • Crear nuevas propiedades (modal)
+   • Eliminar propiedades de otros usuarios
+   • Información completa de cada propiedad
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔐 ACCESO AL PANEL ADMIN:
+
+Método 1 - Después del Login:
+1. Login: admin@dsairsofteam.local / Admin123!
+2. Aparece popup de bienvenida
+3. Haz clic en "Panel Admin"
+4. ¡Listo! Estás en el panel
+
+Método 2 - Acceso Directo:
+http://localhost:8080/admin-panel.html
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📝 ARCHIVOS NUEVOS:
+
+• admin-panel.html          - Panel admin completo (reemplaza admin-operaciones.html)
+• ADMIN_PANEL_GUIDE.md      - Guía detallada (este archivo)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔧 CAMBIOS EN BACKEND:
+
+Backend Routes:
+  ✓ GET  /api/users                - Obtener todos los usuarios
+  ✓ DELETE /api/users/:id          - Eliminar usuario
+  ✓ DELETE /api/properties/:id     - Ahora también admins pueden eliminar
+
+Frontend JavaScript:
+  ✓ showWelcomePopup()             - Función de popup de bienvenida
+  ✓ loadDashboard()                - Cargar estadísticas
+  ✓ loadOperations()               - Cargar operaciones
+  ✓ loadUsers()                    - Cargar usuarios
+  ✓ loadProperties()               - Cargar propiedades
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 QUÉ PUEDE HACER EL ADMIN:
+
+OPERACIONES:
+  ➕ Crear nueva operación
+  ✏️ Ver detalles
+  🔘 Togglear estado (activa/inactiva)
+  🗑️ Eliminar
+
+USUARIOS:
+  👁️ Ver lista completa
+  📊 Ver información detallada
+  🗑️ Eliminar usuario
+
+PROPIEDADES:
+  ➕ Crear nueva propiedad
+  👁️ Ver lista completa
+  🗑️ Eliminar (incluso de otros usuarios)
+  📊 Ver estado y propietario
+
+DASHBOARD:
+  📈 Ver estadísticas en tiempo real
+  📊 Desglose por estado
+  🔢 Números actualizados de BD
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🛠️ PRUEBAS RÁPIDAS:
+
+1. Login
+   Abre: http://localhost:8080/index.html
+   Email: admin@dsairsofteam.local
+   Password: Admin123!
+
+2. Verifica el popup
+   Debería aparecer con "🔐 Acceso de Administrador Activado"
+
+3. Haz clic en "Panel Admin"
+   Te lleva a admin-panel.html
+
+4. Explora cada sección
+   • Dashboard: Ve estadísticas
+   • Operaciones: Crear, togglear, eliminar
+   • Usuarios: Ver lista
+   • Propiedades: Ver lista
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📱 DISEÑO:
+
+Desktop:
+  • Sidebar vertical con navegación
+  • Contenido principal a la derecha
+  • Tablas con scroll
+
+Tablet/Móvil:
+  • Sidebar horizontal como botones
+  • Contenido a pantalla completa
+  • Tablas comprimidas
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔒 SEGURIDAD:
+
+✅ Solo admins pueden acceder al panel
+✅ Verificación de token JWT
+✅ Confirmación de eliminaciones
+✅ Validación de inputs en backend
+✅ No se puede eliminar propio admin
+✅ CORS habilitado para localhost:8080
+
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 TIPS:
+
+1. Los datos se actualizan automáticamente desde la BD
+2. Usa los formularios modales para crear registros
+3. Haz clic fuera de los modales para cerrar
+4. Las tablas muestran datos en tiempo real
+5. Los estilos usan el tema verde del sitio
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTACIÓN COMPLETA:
+Ver ADMIN_PANEL_GUIDE.md para más detalles
+
+═══════════════════════════════════════════════════════════════════════════════
