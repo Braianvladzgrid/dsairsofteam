@@ -276,34 +276,48 @@
 
             grid.innerHTML = operations.map(op => `
                 <div class="event-card">
+                    ${op.image ? `<div class="event-card-image" style="background-image: url('${op.image}'); min-height: 200px; background-size: cover; background-position: center;"></div>` : ''}
                     <div class="event-card-header">
-                        <h3>${op.notes ? op.notes.substring(0, 40) : 'Operación'}</h3>
-                        <p>Código: ${op.id.substring(0, 8).toUpperCase()}</p>
+                        <h3>${op.title || 'Operación Airsoft'}</h3>
+                        <p class="operation-type" style="color: var(--accent); font-weight: bold;">${op.type.toUpperCase()}</p>
                     </div>
                     <div class="event-card-body">
+                        ${op.description ? `<p style="color: var(--gray); font-size: 0.95rem; margin-bottom: 1rem;">${op.description.substring(0, 100)}...</p>` : ''}
                         <div class="event-detail">
                             <i class="fas fa-calendar"></i>
-                            <span><strong>Fecha:</strong> ${new Date(op.start_date).toLocaleDateString('es-ES')}</span>
+                            <span><strong>Fecha:</strong> ${new Date(op.start_date).toLocaleDateString('es-ES', {year: 'numeric', month: 'long', day: 'numeric'})}</span>
                         </div>
                         <div class="event-detail">
                             <i class="fas fa-dollar-sign"></i>
                             <span><strong>Precio:</strong> $${parseFloat(op.price).toFixed(2)}</span>
                         </div>
                         <div class="event-detail">
-                            <i class="fas fa-tag"></i>
-                            <span><strong>Tipo:</strong> ${op.type === 'rent' ? 'Alquiler' : 'Venta'}</span>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span><strong>Ubicación:</strong> ${op.location || 'Por definir'}</span>
                         </div>
                         <div class="event-detail">
-                            <i class="fas fa-info-circle"></i>
-                            <span><strong>Estado:</strong> <span style="color: var(--accent);">${op.status}</span></span>
+                            <i class="fas fa-users"></i>
+                            <span><strong>Participantes:</strong> ${op.participant_count || 0}${op.max_participants ? `/${op.max_participants}` : ''}</span>
                         </div>
                     </div>
                     <div class="event-card-footer">
-                        <span class="cupos">${op.is_active ? '✓ Activa' : '✗ Inactiva'}</span>
-                        <button class="btn btn-primary btn-small" onclick="window.location.href='detalle-operacion.html?id=${op.id}'">Ver Detalle</button>
+                        <span class="cupos" style="background: ${op.is_active ? 'var(--accent)' : 'var(--gray)'}; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem;">
+                            ${op.is_active ? '✓ Disponible' : '✗ Cancelada'}
+                        </span>
+                        <button class="btn btn-primary btn-small" onclick="viewOperationDetail('${op.id}')">Ver Detalle</button>
                     </div>
                 </div>
             `).join('');
+        }
+
+        function viewOperationDetail(opId) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Por favor, inicia sesión para ver los detalles de la operación.');
+                openLoginModal();
+                return;
+            }
+            window.location.href = `detalle-operacion.html?id=${opId}`;
         }
 
         // Modal de iniciar sesión
@@ -311,42 +325,74 @@
         loginModal.id = 'loginModal';
         loginModal.className = 'modal';
         loginModal.innerHTML = `
-            <div class="modal-content" style="max-width: 400px;">
-                <span class="modal-close" onclick="closeLoginModal()">&times;</span>
-                <h3 style="text-align: center; margin-bottom: 1.5rem;">Iniciar Sesión</h3>
-                <form id="login-form">
+            <div class="modal-content" style="max-width: 450px; padding: 3rem 2rem;">
+                <button class="modal-close" onclick="closeLoginModal()" style="background: none; border: none; color: var(--accent); font-size: 2rem; cursor: pointer; position: absolute; top: 10px; right: 15px;">&times;</button>
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <i class="fas fa-user-circle" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem; display: block;"></i>
+                    <h2 style="color: var(--accent); margin-bottom: 0.5rem;">Iniciar Sesión</h2>
+                    <p style="color: var(--gray);">Accede a tu cuenta para participar en operaciones</p>
+                </div>
+                <form id="login-form" onsubmit="handleLogin(event)">
                     <div class="form-group">
-                        <label for="login-email">Email</label>
-                        <input type="email" id="login-email" placeholder="tu@email.com" required>
+                        <label for="login-email" style="color: var(--text); font-weight: 500;">Email</label>
+                        <input type="email" id="login-email" placeholder="tu@email.com" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--accent); border-radius: 4px; color: var(--text); font-size: 1rem;">
                     </div>
                     <div class="form-group">
-                        <label for="login-password">Contraseña</label>
-                        <input type="password" id="login-password" placeholder="Tu contraseña" required>
+                        <label for="login-password" style="color: var(--text); font-weight: 500;">Contraseña</label>
+                        <input type="password" id="login-password" placeholder="Tu contraseña" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--accent); border-radius: 4px; color: var(--text); font-size: 1rem;">
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">
+                    <div id="login-error" style="color: var(--accent); margin-bottom: 1rem; text-align: center; display: none;"></div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; margin-bottom: 1rem;">
                         <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
                     </button>
                 </form>
+                <hr style="border: none; border-top: 1px solid rgba(255,0,110,0.2); margin: 1.5rem 0;">
+                <div style="text-align: center;">
+                    <p style="color: var(--gray); margin-bottom: 1rem;">¿No tienes cuenta?</p>
+                    <a href="registro.html" class="btn btn-secondary" style="width: 100%; padding: 12px; text-decoration: none; display: block;">
+                        <i class="fas fa-user-plus"></i> Registrarse
+                    </a>
+                </div>
+                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,0,110,0.2); font-size: 0.9rem;">
+                    <p style="color: var(--accent); font-weight: bold; margin-bottom: 0.5rem;">Credenciales de Prueba:</p>
+                    <p style="color: var(--gray); margin-bottom: 0.5rem;"><strong>Usuario:</strong> user@example.com / password123</p>
+                    <p style="color: var(--gray);"><strong>Admin:</strong> admin@example.com / admin123</p>
+                </div>
             </div>
         `;
 
         loginModal.style.display = 'none';
+        loginModal.style.position = 'fixed';
+        loginModal.style.top = '0';
+        loginModal.style.left = '0';
+        loginModal.style.width = '100%';
+        loginModal.style.height = '100%';
+        loginModal.style.background = 'rgba(0,0,0,0.7)';
+        loginModal.style.zIndex = '9000';
+        loginModal.style.display = 'none';
+        loginModal.style.alignItems = 'center';
+        loginModal.style.justifyContent = 'center';
         document.body.appendChild(loginModal);
 
         function openLoginModal() {
-            document.getElementById('loginModal').classList.add('active');
+            document.getElementById('loginModal').style.display = 'flex';
         }
 
         function closeLoginModal() {
-            document.getElementById('loginModal').classList.remove('active');
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('login-form').reset();
+            document.getElementById('login-error').style.display = 'none';
         }
 
         // Manejar login
-        document.getElementById('login-form').addEventListener('submit', async function(e) {
+        async function handleLogin(e) {
             e.preventDefault();
 
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+
+            errorDiv.style.display = 'none';
 
             try {
                 const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -368,21 +414,21 @@
                     // Mostrar popup de bienvenida
                     showWelcomePopup(data.user);
                 } else {
-                    alert(`❌ Error: ${data.error || 'Error desconocido'}`);
+                    errorDiv.textContent = `❌ ${data.error || 'Error de login'}`;
+                    errorDiv.style.display = 'block';
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error de conexión. Asegúrate que el backend está corriendo en http://localhost:5000');
+                errorDiv.textContent = '❌ Error de conexión. Asegúrate que el backend está corriendo.';
+                errorDiv.style.display = 'block';
             }
-        });
+        }
 
         // Botón iniciar sesión
         const loginBtn = document.querySelector('.auth-buttons .btn-secondary');
         if (loginBtn) {
             loginBtn.addEventListener('click', openLoginModal);
         }
-
-        // Popup de bienvenida
         function showWelcomePopup(user) {
             const welcomeModal = document.createElement('div');
             welcomeModal.className = 'modal';
@@ -429,8 +475,6 @@
                 }, 3000);
             }
         }
-
-        // Botón iniciar sesión
 
         // DROPDOWN RESPONSIVO
         document.addEventListener('click', function(e) {

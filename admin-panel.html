@@ -719,6 +719,9 @@
                 users.forEach(u => {
                     const row = document.createElement('tr');
                     const adminBadge = u.is_admin ? '<span class="badge badge-danger">Admin</span>' : '<span class="badge badge-info">User</span>';
+                    const adminToggleBtn = u.is_admin 
+                        ? `<button class="btn-small btn-warning" title="Revocar admin" onclick="toggleUserAdmin('${u.id}', false)"><i class="fas fa-shield-alt"></i> Revocar Admin</button>`
+                        : `<button class="btn-small btn-success" title="Hacer admin" onclick="toggleUserAdmin('${u.id}', true)"><i class="fas fa-crown"></i> Hacer Admin</button>`;
 
                     row.innerHTML = `
                         <td>${u.name}</td>
@@ -729,6 +732,7 @@
                         <td>${new Date(u.created_at).toLocaleDateString('es-AR')}</td>
                         <td>
                             <div class="action-buttons">
+                                ${adminToggleBtn}
                                 <button class="btn-small btn-edit" onclick="editUser('${u.id}')">
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -889,6 +893,33 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
+            }
+        }
+
+        async function toggleUserAdmin(id, isAdmin) {
+            const action = isAdmin ? 'hacer administrador' : 'revocar permisos de administrador';
+            if (!confirm(`¿Estás seguro de que deseas ${action} a este usuario?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${id}/toggle-admin`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const message = isAdmin 
+                        ? '✓ Usuario promovido a administrador'
+                        : '✓ Permisos de administrador revocados';
+                    alert(message);
+                    loadUsers();
+                } else {
+                    const data = await response.json();
+                    alert(`❌ Error: ${data.error || 'No se pudo actualizar el usuario'}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al actualizar usuario');
             }
         }
 

@@ -105,6 +105,7 @@ class Operation(db.Model):
     status = db.Column(db.String(20), default='active')  # active, completed, cancelled
     is_active = db.Column(db.Boolean, default=True)
     notes = db.Column(db.Text)
+    image = db.Column(db.Text)  # Base64 encoded image
     created_by = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -126,6 +127,7 @@ class Operation(db.Model):
             'status': self.status,
             'is_active': self.is_active,
             'notes': self.notes,
+            'image': self.image,
             'created_by': self.created_by,
             'participant_count': len(self.participations),
             'created_at': self.created_at.isoformat(),

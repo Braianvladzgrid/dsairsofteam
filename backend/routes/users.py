@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from werkzeug.security import generate_password_hash
 from models import User, db
 from routes.auth import token_required, admin_required
 
@@ -33,7 +34,7 @@ def create_user(current_user):
     new_user = User(
         name=data.get('name'),
         email=data.get('email'),
-        password=data.get('password'),
+        password=generate_password_hash(data.get('password')),
         phone=data.get('phone', ''),
         user_type=data.get('user_type', 'buyer'),
         is_admin=data.get('is_admin', False)
@@ -91,6 +92,29 @@ def update_user(current_user, id):
         'message': 'Profile updated',
         'user': user.to_dict()
     }), 200
+
+@users_bp.route('/<id>/toggle-admin', methods=['POST'])
+@token_required
+@admin_required
+def toggle_admin(current_user, id):
+    """Otorgar o revocar permisos de admin a un usuario"""
+    user = User.query.get(id)
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Proteger al usuario admin que está modificando
+    if user.id == current_user.id:
+        return jsonify({'error': 'Cannot change your own admin status'}), 400
+
+    user.is_admin = not user.is_admin
+    db.session.commit()
+
+    return jsonify({
+        'message': f'User is now {"admin" if user.is_admin else "regular user"}',
+        'user': user.to_dict()
+    }), 200
+
 
 @users_bp.route('/<id>', methods=['DELETE'])
 @token_required

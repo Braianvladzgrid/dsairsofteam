@@ -55,6 +55,7 @@ def get_operation(id):
 
 
 @operations_bp.route('/', methods=['POST'])
+@token_required
 @admin_required
 def create_operation(current_user):
     """Crear una nueva operación airsoft (admin only)"""
@@ -90,6 +91,7 @@ def create_operation(current_user):
             status=data.get('status', 'active'),
             is_active=True,
             notes=data.get('notes', ''),
+            image=data.get('image', ''),
             created_by=current_user.id
         )
 
@@ -109,6 +111,7 @@ def create_operation(current_user):
 
 
 @operations_bp.route('/<id>', methods=['PUT'])
+@token_required
 @admin_required
 def update_operation(current_user, id):
     """Actualizar una operación (admin only)"""
@@ -142,6 +145,8 @@ def update_operation(current_user, id):
         operation.is_active = data['is_active']
     if 'notes' in data:
         operation.notes = data['notes']
+    if 'image' in data:
+        operation.image = data['image']
     if 'start_date' in data:
         operation.start_date = datetime.fromisoformat(data['start_date'].replace('Z', '+00:00'))
     if 'end_date' in data:
@@ -161,6 +166,7 @@ def update_operation(current_user, id):
 
 
 @operations_bp.route('/<id>', methods=['DELETE'])
+@token_required
 @admin_required
 def delete_operation(current_user, id):
     """Eliminar una operación (admin only)"""
