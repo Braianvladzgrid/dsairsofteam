@@ -645,10 +645,14 @@
             </div>
 
             <!-- Estadísticas de asistencia -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
                 <div style="background: #f0fdf4; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #86efac;">
                     <div style="font-size: 2rem; font-weight: bold; color: #16a34a;" id="attendance-total">0</div>
                     <div style="font-size: 0.85rem; color: #15803d; margin-top: 0.25rem;">Total Registrados</div>
+                </div>
+                <div style="background: #eff6ff; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #93c5fd;">
+                    <div style="font-size: 2rem; font-weight: bold; color: #2563eb;" id="attendance-pending">0</div>
+                    <div style="font-size: 0.85rem; color: #1e40af; margin-top: 0.25rem;">Pendientes</div>
                 </div>
                 <div style="background: #ecfdf5; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #6ee7b7;">
                     <div style="font-size: 2rem; font-weight: bold; color: #059669;" id="attendance-present">0</div>
@@ -680,6 +684,77 @@
 
             <div style="margin-top: 1.5rem; text-align: right; padding-top: 1rem; border-top: 2px solid #e5e7eb;">
                 <button class="btn btn-secondary" onclick="closeAttendanceModal()">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLES DE USUARIO -->
+    <div id="userDetailsModal" class="form-modal" style="display: none;">
+        <div class="modal-inner" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-circle"></i> Detalles de Usuario: <span id="user-detail-name"></span></h3>
+                <button class="modal-close" onclick="closeUserDetailsModal()">&times;</button>
+            </div>
+
+            <!-- Estadísticas de Participación -->
+            <div style="margin-bottom: 2rem;">
+                <h4 style="margin-bottom: 1rem; color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem;">
+                    <i class="fas fa-chart-bar"></i> Estadísticas de Participación
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                    <div style="background: #eff6ff; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #93c5fd;">
+                        <div style="font-size: 2rem; font-weight: bold; color: #2563eb;" id="user-stat-total">0</div>
+                        <div style="font-size: 0.85rem; color: #1e40af; margin-top: 0.25rem;">Total Registros</div>
+                    </div>
+                    <div style="background: #ecfdf5; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #6ee7b7;">
+                        <div style="font-size: 2rem; font-weight: bold; color: #059669;" id="user-stat-attended">0</div>
+                        <div style="font-size: 0.85rem; color: #047857; margin-top: 0.25rem;">Asistió</div>
+                    </div>
+                    <div style="background: #fef9e7; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #fde047;">
+                        <div style="font-size: 2rem; font-weight: bold; color: #ca8a04;" id="user-stat-pending">0</div>
+                        <div style="font-size: 0.85rem; color: #a16207; margin-top: 0.25rem;">Pendientes</div>
+                    </div>
+                    <div style="background: #fef2f2; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #fca5a5;">
+                        <div style="font-size: 2rem; font-weight: bold; color: #dc2626;" id="user-stat-cancelled">0</div>
+                        <div style="font-size: 0.85rem; color: #b91c1c; margin-top: 0.25rem;">No Participó</div>
+                    </div>
+                    <div style="background: #f3f4f6; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #d1d5db;">
+                        <div style="font-size: 2rem; font-weight: bold; color: #4b5563;" id="user-stat-rate">0%</div>
+                        <div style="font-size: 0.85rem; color: #6b7280; margin-top: 0.25rem;">Tasa Asistencia</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notas Privadas de Admin -->
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="margin-bottom: 1rem; color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem;">
+                    <i class="fas fa-sticky-note"></i> Notas Privadas (Solo Admins)
+                </h4>
+
+                <!-- Formulario Nueva Nota -->
+                <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #d1d5db;">
+                    <textarea 
+                        id="new-admin-note" 
+                        placeholder="Escribir una nota privada sobre este usuario..."
+                        style="width: 100%; min-height: 80px; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem; font-family: inherit; resize: vertical;"
+                    ></textarea>
+                    <div style="margin-top: 0.75rem; text-align: right;">
+                        <button class="btn btn-primary" onclick="saveAdminNote()">
+                            <i class="fas fa-save"></i> Guardar Nota
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de Notas -->
+                <div id="admin-notes-list" style="max-height: 400px; overflow-y: auto;">
+                    <p style="text-align: center; color: #999; padding: 2rem;">No hay notas aún</p>
+                </div>
+            </div>
+
+            <div style="text-align: right; padding-top: 1rem; border-top: 2px solid #e5e7eb;">
+                <button class="btn btn-secondary" onclick="closeUserDetailsModal()">
                     <i class="fas fa-times"></i> Cerrar
                 </button>
             </div>
@@ -877,6 +952,9 @@
                         <td>${new Date(u.created_at).toLocaleDateString('es-AR')}</td>
                         <td>
                             <div class="action-buttons">
+                                <button class="btn-small btn-primary" onclick="viewUserDetails('${u.id}')" title="Ver estadísticas y notas">
+                                    <i class="fas fa-chart-bar"></i> Detalles
+                                </button>
                                 ${adminToggleBtn}
                                 <button class="btn-small btn-edit" onclick="editUser('${u.id}')">
                                     <i class="fas fa-edit"></i>
@@ -1034,17 +1112,19 @@
 
             if (participants.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem; color: #999;">No hay participantes registrados</td></tr>';
-                updateAttendanceStats(0, 0, 0);
+                updateAttendanceStats(0, 0, 0, 0);
                 return;
             }
 
             let totalRegistered = participants.length;
+            let totalPending = 0;
             let totalAttended = 0;
             let totalAbsent = 0;
 
             participants.forEach((p, index) => {
+                if (p.status === 'registered') totalPending++;
                 if (p.status === 'attended') totalAttended++;
-                if (p.status === 'registered') totalAbsent++;
+                if (p.status === 'cancelled') totalAbsent++;
 
                 const row = document.createElement('tr');
                 const registeredDate = new Date(p.joined_at).toLocaleDateString('es-AR', {
@@ -1066,18 +1146,25 @@
                     <td style="color: #6b7280;">${p.user_email}</td>
                     <td style="color: #6b7280; font-size: 0.9rem;">${registeredDate}</td>
                     <td style="text-align: center;">
-                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                        <div style="display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap;">
+                            <button 
+                                class="btn-small ${p.status === 'registered' ? 'btn-info' : ''}" 
+                                onclick="updateAttendance('${operationId}', '${p.id}', 'registered')"
+                                style="padding: 0.35rem 0.7rem; font-size: 0.85rem; ${p.status === 'registered' ? 'font-weight: bold; background: #3b82f6; color: white;' : 'background: #e5e7eb; color: #6b7280;'}"
+                                title="Marcar como pendiente">
+                                <i class="fas fa-clock"></i> Pendiente
+                            </button>
                             <button 
                                 class="btn-small ${p.status === 'attended' ? 'btn-success' : ''}" 
                                 onclick="updateAttendance('${operationId}', '${p.id}', 'attended')"
-                                style="padding: 0.4rem 0.8rem; ${p.status === 'attended' ? 'font-weight: bold;' : 'background: #d1d5db; color: #374151;'}"
+                                style="padding: 0.35rem 0.7rem; font-size: 0.85rem; ${p.status === 'attended' ? 'font-weight: bold; background: #10b981; color: white;' : 'background: #e5e7eb; color: #6b7280;'}"
                                 title="Marcar como asistió">
                                 <i class="fas fa-check"></i> Asistió
                             </button>
                             <button 
-                                class="btn-small ${p.status === 'registered' ? 'btn-warning' : ''}" 
-                                onclick="updateAttendance('${operationId}', '${p.id}', 'registered')"
-                                style="padding: 0.4rem 0.8rem; ${p.status === 'registered' ? 'font-weight: bold;' : 'background: #d1d5db; color: #374151;'}"
+                                class="btn-small ${p.status === 'cancelled' ? 'btn-danger' : ''}" 
+                                onclick="updateAttendance('${operationId}', '${p.id}', 'cancelled')"
+                                style="padding: 0.35rem 0.7rem; font-size: 0.85rem; ${p.status === 'cancelled' ? 'font-weight: bold; background: #ef4444; color: white;' : 'background: #e5e7eb; color: #6b7280;'}"
                                 title="Marcar como no asistió">
                                 <i class="fas fa-times"></i> No Asistió
                             </button>
@@ -1087,11 +1174,12 @@
                 tbody.appendChild(row);
             });
 
-            updateAttendanceStats(totalRegistered, totalAttended, totalAbsent);
+            updateAttendanceStats(totalRegistered, totalPending, totalAttended, totalAbsent);
         }
 
-        function updateAttendanceStats(total, attended, absent) {
+        function updateAttendanceStats(total, pending, attended, absent) {
             document.getElementById('attendance-total').textContent = total;
+            document.getElementById('attendance-pending').textContent = pending;
             document.getElementById('attendance-present').textContent = attended;
             document.getElementById('attendance-absent').textContent = absent;
         }
@@ -1115,11 +1203,14 @@
                     const participants = await participantsResponse.json();
                     renderAttendanceList(participants, operationId);
                 } else {
-                    alert('❌ Error al actualizar asistencia');
+                    const errorData = await response.json().catch(() => ({}));
+                    const errorMsg = errorData.error || 'Error desconocido';
+                    console.error('Error al actualizar asistencia:', response.status, errorMsg);
+                    alert(`❌ Error al actualizar asistencia: ${errorMsg}`);
                 }
             } catch (error) {
-                console.error('Error:', error);
-                alert('Error al actualizar asistencia');
+                console.error('Error de red:', error);
+                alert('❌ Error de conexión al actualizar asistencia');
             }
         }
 
@@ -1309,6 +1400,169 @@
             } catch (error) {
                 console.error('Error:', error);
                 alert(`❌ Error al actualizar usuario: ${error.message}`);
+            }
+        }
+
+        // MODAL DETALLES DE USUARIO
+        let currentUserDetailsId = null;
+
+        async function viewUserDetails(userId) {
+            currentUserDetailsId = userId;
+            
+            try {
+                // Cargar información del usuario
+                const userResponse = await fetch(`${API_BASE_URL}/users/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await userResponse.json();
+                
+                // Cargar estadísticas
+                const statsResponse = await fetch(`${API_BASE_URL}/users/${userId}/stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const stats = await statsResponse.json();
+                
+                // Cargar notas
+                const notesResponse = await fetch(`${API_BASE_URL}/users/${userId}/admin-notes`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const notes = await notesResponse.json();
+                
+                // Actualizar modal
+                document.getElementById('user-detail-name').textContent = userData.name;
+                document.getElementById('user-stat-total').textContent = stats.total_registered || 0;
+                document.getElementById('user-stat-attended').textContent = stats.total_attended || 0;
+                document.getElementById('user-stat-pending').textContent = stats.total_pending || 0;
+                document.getElementById('user-stat-cancelled').textContent = stats.total_cancelled || 0;
+                document.getElementById('user-stat-rate').textContent = (stats.participation_rate || 0) + '%';
+                
+                // Renderizar notas
+                renderAdminNotes(notes);
+                
+                // Mostrar modal
+                document.getElementById('userDetailsModal').style.display = 'flex';
+                setTimeout(() => {
+                    document.getElementById('userDetailsModal').classList.add('active');
+                }, 10);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al cargar detalles del usuario');
+            }
+        }
+
+        function closeUserDetailsModal() {
+            document.getElementById('userDetailsModal').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('userDetailsModal').style.display = 'none';
+                document.getElementById('new-admin-note').value = '';
+                currentUserDetailsId = null;
+            }, 300);
+        }
+
+        function renderAdminNotes(notes) {
+            const container = document.getElementById('admin-notes-list');
+            
+            if (!notes || notes.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem;">No hay notas aún</p>';
+                return;
+            }
+            
+            container.innerHTML = notes.map(note => {
+                const date = new Date(note.created_at).toLocaleDateString('es-AR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                return `
+                    <div style="background: white; border: 1px solid #d1d5db; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                            <div>
+                                <strong style="color: #374151;">${note.admin_name}</strong>
+                                <span style="color: #9ca3af; font-size: 0.85rem; margin-left: 0.5rem;">${date}</span>
+                            </div>
+                            <button 
+                                class="btn-small btn-delete" 
+                                onclick="deleteAdminNote('${note.id}')"
+                                style="padding: 0.25rem 0.5rem; font-size: 0.85rem;"
+                                title="Eliminar nota">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <p style="margin: 0; color: #4b5563; white-space: pre-wrap;">${note.note}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function saveAdminNote() {
+            const noteText = document.getElementById('new-admin-note').value.trim();
+            
+            if (!noteText) {
+                alert('Por favor escribe una nota');
+                return;
+            }
+            
+            if (!currentUserDetailsId) {
+                alert('Error: No hay usuario seleccionado');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${currentUserDetailsId}/admin-notes`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ note: noteText })
+                });
+                
+                if (response.ok) {
+                    // Recargar notas
+                    const notesResponse = await fetch(`${API_BASE_URL}/users/${currentUserDetailsId}/admin-notes`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const notes = await notesResponse.json();
+                    
+                    renderAdminNotes(notes);
+                    document.getElementById('new-admin-note').value = '';
+                    
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    alert(`❌ Error al guardar nota: ${errorData.error || 'Error desconocido'}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al guardar nota');
+            }
+        }
+
+        async function deleteAdminNote(noteId) {
+            if (!confirm('¿Eliminar esta nota?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${currentUserDetailsId}/admin-notes/${noteId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    // Recargar notas
+                    const notesResponse = await fetch(`${API_BASE_URL}/users/${currentUserDetailsId}/admin-notes`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const notes = await notesResponse.json();
+                    renderAdminNotes(notes);
+                } else {
+                    alert('❌ Error al eliminar nota');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al eliminar nota');
             }
         }
 

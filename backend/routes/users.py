@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash
-from models import User, db
+from models import User, AdminNote, Participation, db
 from routes.auth import token_required, admin_required
 
 users_bp = Blueprint('users', __name__, url_prefix='/api/users')
@@ -134,3 +134,105 @@ def delete_user(current_user, id):
     db.session.commit()
 
     return jsonify({'message': 'User deleted'}), 200
+
+
+@users_bp.route('/<id>/stats', methods=['GET'])
+@token_required
+@admin_required
+def get_user_stats(current_user, id):
+    """Obtener estadísticas de participación de un usuario (solo admin)"""
+    user = User.query.get(id)
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Obtener todas las participaciones del usuario
+    participations = Participation.query.filter_by(user_id=id).all()
+    
+    # Contar por estado
+    total_registered = len(participations)
+    total_attended = len([p for p in participations if p.status == 'attended'])
+    total_cancelled = len([p for p in participations if p.status == 'cancelled'])
+    total_pending = len([p for p in participations if p.status == 'registered'])
+    
+    # Calcular juegos en los que NO participó (se registró pero canceló o no asistió)
+    total_not_participated = total_cancelled
+
+    return jsonify({
+        'user_id': id,
+        'user_name': user.name,
+        'total_registered': total_registered,
+        'total_attended': total_attended,
+        'total_pending': total_pending,
+        'total_cancelled': total_cancelled,
+        'total_not_participated': total_not_participated,
+        'participation_rate': round((total_attended / total_registered * 100) if total_registered > 0 else 0, 2)
+    }), 200
+
+
+@users_bp.route('/<id>/admin-notes', methods=['GET'])
+@token_required
+@admin_required
+def get_admin_notes(current_user, id):
+    """Obtener notas privadas de admin sobre un usuario (solo admin)"""
+    user = User.query.get(id)
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    notes = AdminNote.query.filter_by(user_id=id).order_by(AdminNote.created_at.desc()).all()
+    
+    return jsonify([note.to_dict() for note in notes]), 200
+
+
+@users_bp.route('/<id>/admin-notes', methods=['POST'])
+@token_required
+@admin_required
+def create_admin_note(current_user, id):
+    """Crear una nota privada de admin sobre un usuario (solo admin)"""
+    user = User.query.get(id)
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    data = request.get_json()
+    
+    if not data.get('note'):
+        return jsonify({'error': 'Note text is required'}), 400
+
+    note = AdminNote(
+        user_id=id,
+        admin_id=current_user.id,
+        note=data.get('note')
+    )
+
+    db.session.add(note)
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Admin note created',
+        'note': note.to_dict()
+    }), 201
+
+
+@users_bp.route('/<user_id>/admin-notes/<note_id>', methods=['DELETE'])
+@token_required
+@admin_required
+def delete_admin_note(current_user, user_id, note_id):
+    """Eliminar una nota privada de admin (solo admin que la creó)"""
+    note = AdminNote.query.get(note_id)
+
+    if not note:
+        return jsonify({'error': 'Note not found'}), 404
+
+    if note.user_id != user_id:
+        return jsonify({'error': 'Note does not belong to this user'}), 400
+
+    # Solo el admin que creó la nota puede eliminarla (o cualquier admin)
+    # if note.admin_id != current_user.id and not current_user.is_admin:
+    #     return jsonify({'error': 'Not authorized'}), 403
+
+    db.session.delete(note)
+    db.session.commit()
+
+    return jsonify({'message': 'Admin note deleted'}), 200

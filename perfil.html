@@ -68,14 +68,6 @@
                         <a href="index.html#operaciones-pasadas">Operaciones Pasadas</a>
                     </div>
                 </li>
-                <li class="dropdown">
-                    <a href="#">Réplicas <i class="fas fa-chevron-down"></i></a>
-                    <div class="dropdown-menu">
-                        <a href="alquiler.html">Alquilar mi Réplica</a>
-                        <a href="index.html#alquileres">Alquileres Disponibles</a>
-                        <a href="compra.html">Comprar Réplica</a>
-                    </div>
-                </li>
                 <li><a href="perfil.html">Mi Perfil</a></li>
             </ul>
             <div class="auth-buttons">
@@ -154,6 +146,9 @@
                         </div>
                     `;
                 }
+            } else {
+                // Usuario NO logeado - redirigir al inicio
+                window.location.href = 'index.html';
             }
         }
 
@@ -231,17 +226,21 @@
                         document.getElementById('userIcon').style.display = 'none';
                     }
 
-                    // Generar código QR único para este usuario
-                    generateUserQR(userData.id);
-
-                    // Cargar información editable
+                    // Cargar información editable PRIMERO (esto crea el elemento qrCode)
                     renderProfileInfo();
+
+                    // Generar código QR único para este usuario DESPUÉS
+                    generateUserQR(userData.id);
                 } else {
-                    alert('Error al cargar perfil');
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('Error al cargar perfil:', response.status, errorData);
+                    alert(`Error al cargar perfil: ${errorData.error || 'Error desconocido'}`);
+                    window.location.href = 'index.html';
                 }
             } catch (error) {
-                console.error('Error:', error);
-                alert('Error de conexión');
+                console.error('Error de conexión:', error);
+                alert(`Error de conexión con el servidor. Asegúrate de que el backend esté corriendo en http://localhost:5000\n\nError: ${error.message}`);
+                window.location.href = 'index.html';
             }
         }
 
@@ -331,6 +330,10 @@
         function cancelEdit() {
             isEditing = false;
             renderProfileInfo();
+            // Regenerar QR después de cancelar edición
+            if (currentUser && currentUser.id) {
+                generateUserQR(currentUser.id);
+            }
         }
 
         async function saveProfile(event) {
@@ -359,6 +362,10 @@
                     alert('✓ Perfil actualizado exitosamente');
                     isEditing = false;
                     renderProfileInfo();
+                    // Regenerar QR después de guardar
+                    if (currentUser && currentUser.id) {
+                        generateUserQR(currentUser.id);
+                    }
                 } else {
                     alert('❌ Error al actualizar perfil');
                 }

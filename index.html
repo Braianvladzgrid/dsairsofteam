@@ -175,13 +175,6 @@
                         <a href="#operaciones-pasadas">Operaciones Pasadas</a>
                     </div>
                 </li>
-                <li class="dropdown">
-                    <a href="#">Usuarios <i class="fas fa-chevron-down"></i></a>
-                    <div class="dropdown-menu" id="usuarios-menu">
-                        <a href="#">Cargando usuarios...</a>
-                    </div>
-                </li>
-
                 <li><a href="perfil.html">Mi Perfil</a></li>
             </ul>
             <div class="auth-buttons">
@@ -341,37 +334,6 @@
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.reload();
-        }
-
-        // Cargar usuarios en dropdown
-        async function loadUsersMenu() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/users`);
-                if (!response.ok) throw new Error('Error al cargar usuarios');
-                
-                const users = await response.json();
-                const usuariosMenu = document.getElementById('usuarios-menu');
-                
-                if (users.length === 0) {
-                    usuariosMenu.innerHTML = '<a href="#">No hay usuarios</a>';
-                    return;
-                }
-
-                usuariosMenu.innerHTML = users.map(user => `
-                    <div style="padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid rgba(0,0,0,0.1); text-decoration: none; color: inherit;">
-                        <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-                            ${user.photo ? `<img src="${user.photo}" alt="${user.name}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : user.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                            <div style="font-weight: 500; color: var(--text);">${user.name}</div>
-                            <div style="font-size: 0.85rem; color: var(--text-secondary);">${user.email}</div>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error cargando usuarios:', error);
-                document.getElementById('usuarios-menu').innerHTML = '<a href="#">Error al cargar usuarios</a>';
-            }
         }
 
         // Cargar operaciones activas
@@ -667,7 +629,9 @@
             checkSession();
             loadActiveOperations();
             loadPastOperations();
-            loadUsersMenu();
+            loadActiveOperations();
+            loadPastOperations();
+            checkSession();
 
             const params = new URLSearchParams(window.location.search);
             if (params.get('login') === '1') {

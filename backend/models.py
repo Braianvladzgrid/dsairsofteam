@@ -164,3 +164,28 @@ class Participation(db.Model):
             'status': self.status,
             'joined_at': self.joined_at.isoformat(),
         }
+
+
+class AdminNote(db.Model):
+    __tablename__ = 'admin_notes'
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)  # Usuario sobre el que se escribe la nota
+    admin_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)  # Admin que escribe la nota
+    note = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship('User', foreign_keys=[user_id], backref='notes_about_user')
+    admin = db.relationship('User', foreign_keys=[admin_id], backref='notes_by_admin')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'admin_id': self.admin_id,
+            'admin_name': self.admin.name,
+            'note': self.note,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+        }
