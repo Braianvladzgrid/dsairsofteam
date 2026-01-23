@@ -109,18 +109,6 @@
                     <!-- Se cargará dinámicamente con JavaScript -->
                 </div>
 
-                <!-- SECCIÓN DE CÓDIGO QR -->
-                <div class="qr-section">
-                    <h3><i class="fas fa-qrcode"></i> Tu Código QR Personal</h3>
-                    <p class="qr-info-text">Este código QR es único e irrepetible. Compártelo para que otros puedan ver tu perfil.</p>
-                    <div class="qr-container">
-                        <div id="qrCode"></div>
-                        <div class="qr-id-info">
-                            ID: <strong id="qrUserCode"></strong>
-                        </div>
-                    </div>
-                </div>
-
                 <div style="margin-top: 2rem;">
                     <a href="index.html" class="btn btn-primary" style="width: 100%; padding: 1rem; text-align: center;">
                         <i class="fas fa-arrow-left"></i> Volver al Inicio
@@ -323,10 +311,12 @@
                     <!-- SECCIÓN DE CÓDIGO QR -->
                     <div class="qr-section">
                         <h3><i class="fas fa-qrcode"></i> Mi Código QR</h3>
-                        <p class="qr-info-text">Comparte este código QR para que otros accedan rápidamente a tu perfil</p>
-                        <div class="qr-container" id="qrCode"></div>
+                        <p class="qr-info-text">Este código QR es único e irrepetible. Compártelo para que otros puedan ver tu perfil.</p>
+                        <div class="qr-container">
+                            <div id="qrCode"></div>
+                        </div>
                         <div class="qr-id-info">
-                            <small>ID único: <strong id="qrUserCode"></strong></small>
+                            ID: <strong id="qrUserCode"></strong>
                         </div>
                     </div>
                 `;

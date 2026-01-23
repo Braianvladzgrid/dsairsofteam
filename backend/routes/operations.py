@@ -330,3 +330,37 @@ def is_user_registered(current_user, operation_id):
     ).first()
 
     return jsonify({'is_registered': participation is not None}), 200
+
+
+@operations_bp.route('/<operation_id>/participants/<participation_id>/attendance', methods=['PATCH'])
+@token_required
+@admin_required
+def update_attendance(current_user, operation_id, participation_id):
+    """Actualizar asistencia de un participante (admin only)"""
+    participation = Participation.query.get(participation_id)
+
+    if not participation:
+        return jsonify({'error': 'Participation not found'}), 404
+
+    if participation.operation_id != operation_id:
+        return jsonify({'error': 'Participation does not belong to this operation'}), 400
+
+    data = request.get_json()
+    new_status = data.get('status')
+
+    if new_status not in ['registered', 'attended', 'cancelled']:
+        return jsonify({'error': 'Invalid status. Must be: registered, attended, or cancelled'}), 400
+
+    try:
+        participation.status = new_status
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Attendance updated successfully',
+            'participation': participation.to_dict()
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Error updating attendance: {str(e)}'}), 500
+

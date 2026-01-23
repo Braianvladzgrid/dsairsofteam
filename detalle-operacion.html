@@ -398,29 +398,63 @@
     </footer>
 
     <!-- Modal de aceptación para inscripción -->
-    <div id="acceptModal" class="modal" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 9999; align-items: center; justify-content: center;">
-        <div class="modal-content" style="width: 520px; max-width: 92vw; padding: 1.5rem; background: #f7f7f8; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.35); color: #111827;">
-            <div style="display:flex; align-items:center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem;">
-                <h2 style="margin:0; font-size: 1.2rem;">Confirmar inscripción</h2>
-                <button type="button" onclick="closeAcceptModal()" style="border:none; background: transparent; font-size: 1.6rem; line-height: 1; cursor:pointer; color: #6b7280;">&times;</button>
+    <div id="acceptModal" class="modal" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="modal-content" style="width: 540px; max-width: 92vw; padding: 2rem; background: #ffffff; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); color: #1f2937;">
+            <!-- Header -->
+            <div style="display:flex; align-items:center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #e5e7eb;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="background: linear-gradient(135deg, #2d5016, #5a9216); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-clipboard-check" style="color: white; font-size: 1.5rem;"></i>
+                    </div>
+                    <h2 style="margin:0; font-size: 1.4rem; color: #111827; font-weight: 700;">Confirmar Inscripción</h2>
+                </div>
+                <button type="button" onclick="closeAcceptModal()" style="border:none; background: #f3f4f6; width: 36px; height: 36px; border-radius: 8px; font-size: 1.5rem; line-height: 1; cursor:pointer; color: #6b7280; transition: all 0.2s;" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">&times;</button>
             </div>
-            <p style="margin: 0 0 1rem 0; color: #374151; font-size: 0.95rem;">
-                Para inscribirte, debés aceptar los requisitos y las reglas de la operación.
-            </p>
-            <div style="display:grid; gap: 0.75rem;">
-                <label style="display:flex; align-items:flex-start; gap: 0.6rem; cursor: pointer;">
-                    <input id="accept-requirements" type="checkbox" style="margin-top: 0.15rem;">
-                    <span><strong>Acepto los requisitos y equipamiento</strong></span>
+            
+            <!-- Descripción -->
+            <div style="background: #f9fafb; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; border-left: 4px solid #5a9216;">
+                <p style="margin: 0; color: #374151; font-size: 1rem; line-height: 1.6;">
+                    <i class="fas fa-info-circle" style="color: #5a9216; margin-right: 0.5rem;"></i>
+                    Para completar tu inscripción, debes aceptar los requisitos y reglas de la operación.
+                </p>
+            </div>
+            
+            <!-- Checkboxes -->
+            <div style="display:grid; gap: 1rem; margin-bottom: 1rem;">
+                <label style="display:flex; align-items:flex-start; gap: 0.75rem; cursor: pointer; padding: 1rem; background: #f9fafb; border-radius: 10px; border: 2px solid #e5e7eb; transition: all 0.2s;" onmouseover="this.style.borderColor='#5a9216'; this.style.background='#f0f9ff'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                    <input id="accept-requirements" type="checkbox" style="margin-top: 0.25rem; width: 18px; height: 18px; cursor: pointer; accent-color: #5a9216;">
+                    <div>
+                        <span style="font-weight: 700; color: #111827; font-size: 1rem; display: block; margin-bottom: 0.25rem;">
+                            <i class="fas fa-shield-alt" style="color: #5a9216; margin-right: 0.5rem;"></i>Acepto los requisitos y equipamiento
+                        </span>
+                        <span style="font-size: 0.85rem; color: #6b7280;">Confirmo que cumplo con todo el equipamiento necesario</span>
+                    </div>
                 </label>
-                <label style="display:flex; align-items:flex-start; gap: 0.6rem; cursor: pointer;">
-                    <input id="accept-rules" type="checkbox" style="margin-top: 0.15rem;">
-                    <span><strong>Acepto las reglas de la operación</strong></span>
+                <label style="display:flex; align-items:flex-start; gap: 0.75rem; cursor: pointer; padding: 1rem; background: #f9fafb; border-radius: 10px; border: 2px solid #e5e7eb; transition: all 0.2s;" onmouseover="this.style.borderColor='#5a9216'; this.style.background='#f0f9ff'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                    <input id="accept-rules" type="checkbox" style="margin-top: 0.25rem; width: 18px; height: 18px; cursor: pointer; accent-color: #5a9216;">
+                    <div>
+                        <span style="font-weight: 700; color: #111827; font-size: 1rem; display: block; margin-bottom: 0.25rem;">
+                            <i class="fas fa-gavel" style="color: #5a9216; margin-right: 0.5rem;"></i>Acepto las reglas de la operación
+                        </span>
+                        <span style="font-size: 0.85rem; color: #6b7280;">Me comprometo a seguir todas las reglas establecidas</span>
+                    </div>
                 </label>
             </div>
-            <div id="accept-error" style="display:none; margin-top: 0.75rem; color: #b42318; font-size: 0.9rem;"></div>
-            <div style="display:flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
-                <button type="button" class="btn btn-secondary" onclick="closeAcceptModal()" style="padding: 0.75rem 1rem;">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="confirmJoin()" style="padding: 0.75rem 1rem;">Inscribirme</button>
+            
+            <!-- Error message -->
+            <div id="accept-error" style="display:none; margin-top: 1rem; padding: 0.75rem; background: #fef2f2; border-left: 4px solid #dc2626; border-radius: 8px; color: #991b1b; font-size: 0.95rem; font-weight: 600;">
+                <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+                <span id="accept-error-text"></span>
+            </div>
+            
+            <!-- Botones -->
+            <div style="display:flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #e5e7eb;">
+                <button type="button" class="btn btn-secondary" onclick="closeAcceptModal()" style="padding: 0.875rem 1.5rem; font-weight: 600; font-size: 1rem; border-radius: 10px; background: #f3f4f6; color: #374151; border: 2px solid #d1d5db; transition: all 0.2s;" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">
+                    <i class="fas fa-times" style="margin-right: 0.5rem;"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="confirmJoin()" style="padding: 0.875rem 1.5rem; font-weight: 600; font-size: 1rem; border-radius: 10px; background: linear-gradient(135deg, #2d5016, #5a9216); color: white; border: none; box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(45, 80, 22, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(45, 80, 22, 0.3)'">
+                    <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>Confirmar Inscripción
+                </button>
             </div>
         </div>
     </div>
@@ -685,41 +719,65 @@
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0,0,0,0.7);
+                    background: rgba(0,0,0,0.75);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     z-index: 10000;
+                    animation: fadeIn 0.2s ease-out;
                 ">
                     <div style="
                         background: white;
-                        padding: 2rem;
-                        border-radius: 12px;
-                        max-width: 400px;
+                        padding: 2.5rem;
+                        border-radius: 16px;
+                        max-width: 440px;
                         text-align: center;
-                        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+                        animation: slideIn 0.3s ease-out;
                     ">
-                        <div style="color: #f39c12; font-size: 4rem; margin-bottom: 1rem;">
-                            <i class="fas fa-exclamation-circle"></i>
+                        <div style="
+                            background: linear-gradient(135deg, #f59e0b, #f97316);
+                            width: 80px;
+                            height: 80px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin: 0 auto 1.5rem;
+                            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+                        ">
+                            <i class="fas fa-check-circle" style="color: white; font-size: 2.5rem;"></i>
                         </div>
-                        <h2 style="color: #333; margin-bottom: 1rem;">Ya estás registrado</h2>
-                        <p style="color: #666; margin-bottom: 1.5rem;">
-                            Ya te encuentras inscrito en esta operación. No es necesario registrarse nuevamente.
+                        <h2 style="color: #111827; margin-bottom: 1rem; font-size: 1.5rem; font-weight: 700;">Ya estás registrado</h2>
+                        <p style="color: #4b5563; margin-bottom: 2rem; font-size: 1.05rem; line-height: 1.6;">
+                            Ya te encuentras inscrito en esta operación. Puedes ver los detalles en la sección de participantes.
                         </p>
                         <button onclick="cerrarModalYaRegistrado()" style="
-                            background: var(--accent);
+                            background: linear-gradient(135deg, #2d5016, #5a9216);
                             color: white;
                             border: none;
-                            padding: 0.75rem 2rem;
-                            border-radius: 8px;
+                            padding: 1rem 2.5rem;
+                            border-radius: 10px;
                             cursor: pointer;
-                            font-size: 1rem;
-                            font-weight: bold;
-                        ">
-                            Entendido
+                            font-size: 1.05rem;
+                            font-weight: 700;
+                            box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+                            transition: all 0.2s;
+                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(45, 80, 22, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(45, 80, 22, 0.3)'">
+                            <i class="fas fa-thumbs-up" style="margin-right: 0.5rem;"></i>Entendido
                         </button>
                     </div>
                 </div>
+                <style>
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes slideIn {
+                        from { transform: translateY(-20px); opacity: 0; }
+                        to { transform: translateY(0); opacity: 1; }
+                    }
+                </style>
             `;
 
             // Agregar modal al body
@@ -744,7 +802,7 @@
 
             if (!acceptRequirements || !acceptRules) {
                 err.style.display = 'block';
-                err.textContent = 'Debes aceptar requisitos y reglas para continuar.';
+                document.getElementById('accept-error-text').textContent = 'Debes aceptar ambos requisitos y reglas para continuar.';
                 return;
             }
 

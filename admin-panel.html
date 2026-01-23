@@ -169,6 +169,30 @@
             background: #da190b;
         }
 
+        .btn-info {
+            background: #00bcd4;
+        }
+
+        .btn-info:hover {
+            background: #0097a7;
+        }
+
+        .btn-success {
+            background: #4CAF50;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+        }
+
+        .btn-warning {
+            background: #ff9800;
+        }
+
+        .btn-warning:hover {
+            background: #f57c00;
+        }
+
         .btn-toggle {
             background: #4CAF50;
             font-size: 0.8rem;
@@ -606,6 +630,62 @@
         </div>
     </div>
 
+    <!-- MODAL ASISTENCIA -->
+    <div id="attendanceModal" class="form-modal" style="display: none;">
+        <div class="modal-inner" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-clipboard-check"></i> Lista de Asistencia: <span id="attendance-op-title"></span></h3>
+                <button class="modal-close" onclick="closeAttendanceModal()">&times;</button>
+            </div>
+            
+            <div style="margin-bottom: 1rem; padding: 1rem; background: #f0f9ff; border-left: 4px solid #0ea5e9; border-radius: 8px;">
+                <p style="margin: 0; color: #0c4a6e; font-size: 0.95rem;">
+                    <i class="fas fa-info-circle"></i> Marca la asistencia de los participantes. Los cambios se guardan automáticamente.
+                </p>
+            </div>
+
+            <!-- Estadísticas de asistencia -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="background: #f0fdf4; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #86efac;">
+                    <div style="font-size: 2rem; font-weight: bold; color: #16a34a;" id="attendance-total">0</div>
+                    <div style="font-size: 0.85rem; color: #15803d; margin-top: 0.25rem;">Total Registrados</div>
+                </div>
+                <div style="background: #ecfdf5; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #6ee7b7;">
+                    <div style="font-size: 2rem; font-weight: bold; color: #059669;" id="attendance-present">0</div>
+                    <div style="font-size: 0.85rem; color: #047857; margin-top: 0.25rem;">Asistieron</div>
+                </div>
+                <div style="background: #fef2f2; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #fca5a5;">
+                    <div style="font-size: 2rem; font-weight: bold; color: #dc2626;" id="attendance-absent">0</div>
+                    <div style="font-size: 0.85rem; color: #b91c1c; margin-top: 0.25rem;">No Asistieron</div>
+                </div>
+            </div>
+
+            <!-- Lista de participantes -->
+            <div style="max-height: 500px; overflow-y: auto;">
+                <table class="data-table" style="margin: 0;">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Fecha Registro</th>
+                            <th style="text-align: center; width: 200px;">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-list">
+                        <!-- Se llena dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 1.5rem; text-align: right; padding-top: 1rem; border-top: 2px solid #e5e7eb;">
+                <button class="btn btn-secondary" onclick="closeAttendanceModal()">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE_URL = 'http://localhost:5000/api';
         const token = localStorage.getItem('token');
@@ -740,6 +820,9 @@
                         <td>${new Date(op.start_date).toLocaleDateString('es-AR')}</td>
                         <td>
                             <div class="action-buttons">
+                                <button class="btn-small btn-info" onclick="showAttendanceList('${op.id}', '${op.title}')" title="Ver asistencia">
+                                    <i class="fas fa-clipboard-check"></i>
+                                </button>
                                 <button class="btn-small btn-edit" onclick="editOperation('${op.id}')">
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -897,6 +980,151 @@
             } catch (error) {
                 console.error('Error:', error);
             }
+        }
+
+        async function deleteOperation(id) {
+            if (!confirm('¿Estás seguro de eliminar esta operación? Esta acción no se puede deshacer.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    alert('✓ Operación eliminada');
+                    loadOperations();
+                } else {
+                    alert('❌ Error al eliminar operación');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar operación');
+            }
+        }
+
+        // ASISTENCIA - MOSTRAR MODAL
+        async function showAttendanceList(operationId, operationTitle) {
+            document.getElementById('attendance-op-title').textContent = operationTitle;
+            document.getElementById('attendanceModal').style.display = 'flex';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/${operationId}/participants`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    alert('❌ Error al cargar participantes');
+                    return;
+                }
+
+                const participants = await response.json();
+                renderAttendanceList(participants, operationId);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar participantes');
+            }
+        }
+
+        function renderAttendanceList(participants, operationId) {
+            const tbody = document.getElementById('attendance-list');
+            tbody.innerHTML = '';
+
+            if (participants.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem; color: #999;">No hay participantes registrados</td></tr>';
+                updateAttendanceStats(0, 0, 0);
+                return;
+            }
+
+            let totalRegistered = participants.length;
+            let totalAttended = 0;
+            let totalAbsent = 0;
+
+            participants.forEach((p, index) => {
+                if (p.status === 'attended') totalAttended++;
+                if (p.status === 'registered') totalAbsent++;
+
+                const row = document.createElement('tr');
+                const registeredDate = new Date(p.joined_at).toLocaleDateString('es-AR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                row.innerHTML = `
+                    <td style="font-weight: 600; color: #6b7280;">${index + 1}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-user-circle" style="color: #6b7280; font-size: 1.2rem;"></i>
+                            <strong>${p.user_name}</strong>
+                        </div>
+                    </td>
+                    <td style="color: #6b7280;">${p.user_email}</td>
+                    <td style="color: #6b7280; font-size: 0.9rem;">${registeredDate}</td>
+                    <td style="text-align: center;">
+                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                            <button 
+                                class="btn-small ${p.status === 'attended' ? 'btn-success' : ''}" 
+                                onclick="updateAttendance('${operationId}', '${p.id}', 'attended')"
+                                style="padding: 0.4rem 0.8rem; ${p.status === 'attended' ? 'font-weight: bold;' : 'background: #d1d5db; color: #374151;'}"
+                                title="Marcar como asistió">
+                                <i class="fas fa-check"></i> Asistió
+                            </button>
+                            <button 
+                                class="btn-small ${p.status === 'registered' ? 'btn-warning' : ''}" 
+                                onclick="updateAttendance('${operationId}', '${p.id}', 'registered')"
+                                style="padding: 0.4rem 0.8rem; ${p.status === 'registered' ? 'font-weight: bold;' : 'background: #d1d5db; color: #374151;'}"
+                                title="Marcar como no asistió">
+                                <i class="fas fa-times"></i> No Asistió
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updateAttendanceStats(totalRegistered, totalAttended, totalAbsent);
+        }
+
+        function updateAttendanceStats(total, attended, absent) {
+            document.getElementById('attendance-total').textContent = total;
+            document.getElementById('attendance-present').textContent = attended;
+            document.getElementById('attendance-absent').textContent = absent;
+        }
+
+        async function updateAttendance(operationId, participationId, status) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/${operationId}/participants/${participationId}/attendance`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status })
+                });
+
+                if (response.ok) {
+                    // Recargar lista para actualizar visualmente
+                    const participantsResponse = await fetch(`${API_BASE_URL}/operations/${operationId}/participants`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const participants = await participantsResponse.json();
+                    renderAttendanceList(participants, operationId);
+                } else {
+                    alert('❌ Error al actualizar asistencia');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al actualizar asistencia');
+            }
+        }
+
+        function closeAttendanceModal() {
+            document.getElementById('attendanceModal').style.display = 'none';
         }
 
         async function deleteOperation(id) {
@@ -1141,6 +1369,9 @@
             }
             if (e.target.id === 'userModal') {
                 closeUserForm();
+            }
+            if (e.target.id === 'attendanceModal') {
+                closeAttendanceModal();
             }
         });
 
