@@ -23,7 +23,12 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     properties = db.relationship('Property', backref='owner', lazy=True, foreign_keys='Property.user_id')
-    created_operations = db.relationship('Operation', backref='creator_user', lazy=True, foreign_keys='Operation.created_by')
+    created_operations = db.relationship(
+        'Operation',
+        back_populates='creator',
+        lazy=True,
+        foreign_keys='Operation.created_by'
+    )
 
     def to_dict(self):
         return {
@@ -113,7 +118,11 @@ class Operation(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    creator = db.relationship('User', foreign_keys=[created_by])
+    creator = db.relationship(
+        'User',
+        back_populates='created_operations',
+        foreign_keys=[created_by]
+    )
     participations = db.relationship('Participation', backref='operation', lazy=True, cascade='all, delete-orphan')
 
     def to_dict(self, include_participants=False):
@@ -149,19 +158,26 @@ class Participation(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     operation_id = db.Column(db.String(36), db.ForeignKey('operations.id'), nullable=False)
-    status = db.Column(db.String(20), default='registered')  # registered, attended, cancelled
+    # Estado de asistencia (admin): pending (neutro), attended, absent.
+    # Compatibilidad histórica: 'registered' -> pending, 'cancelled' -> absent.
+    status = db.Column(db.String(20), default='pending')
     joined_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref='user_participations')
 
     def to_dict(self):
+        status = self.status
+        if status == 'registered':
+            status = 'pending'
+        elif status == 'cancelled':
+            status = 'absent'
         return {
             'id': self.id,
             'user_id': self.user_id,
             'user_name': self.user.name,
             'user_email': self.user.email,
             'operation_id': self.operation_id,
-            'status': self.status,
+            'status': status,
             'joined_at': self.joined_at.isoformat(),
         }
 

@@ -13,6 +13,13 @@ class Config:
     JWT_SECRET = os.getenv('JWT_SECRET', 'tu_super_secret_key_aqui_cambiar_en_produccion')
     JWT_EXPIRE = int(os.getenv('JWT_EXPIRE', 604800))  # 7 days
 
+    # Límite de payload (protege de uploads/base64 gigantes)
+    # 2MB binario en base64 ≈ 2.7MB + JSON overhead; dejamos margen.
+    MAX_CONTENT_LENGTH = int(os.getenv('MAX_CONTENT_LENGTH', 5 * 1024 * 1024))  # 5MB
+
+    # Evitar revelar detalles innecesarios
+    JSONIFY_PRETTYPRINT_REGULAR = False
+
 class DevelopmentConfig(Config):
     DEBUG = True
 

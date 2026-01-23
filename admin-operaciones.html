@@ -477,7 +477,13 @@
         async function checkAdmin() {
             try {
                 const response = await fetch(`${API_BASE_URL}/auth/me`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
                 if (!response.ok || !(await response.json()).is_admin) {
                     alert('❌ Solo admins pueden acceder');
@@ -494,7 +500,13 @@
             loading.classList.add('active');
             try {
                 const response = await fetch(`${API_BASE_URL}/operations/admin`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
                 const operations = await response.json();
                 if (operations.length === 0) {
@@ -607,7 +619,13 @@
         async function editOperation(id) {
             try {
                 const response = await fetch(`${API_BASE_URL}/operations/${id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
                 const op = await response.json();
                 document.getElementById('operationId').value = op.id;
@@ -662,8 +680,10 @@
                     method: id ? 'PUT' : 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
+                    credentials: 'include',
                     body: JSON.stringify(data)
                 });
                 if (response.ok) {
@@ -690,8 +710,10 @@
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
+                    credentials: 'include',
                     body: JSON.stringify({ is_active: !isActive })
                 });
                 loadOperations();
@@ -705,7 +727,12 @@
             try {
                 await fetch(`${API_BASE_URL}/operations/${id}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
                 loadOperations();
             } catch (error) {

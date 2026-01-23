@@ -304,7 +304,7 @@
                 if (authButtons) {
                     let adminLink = '';
                     if (user.is_admin) {
-                        adminLink = `<a href="admin-panel.html" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+                        adminLink = `<a href="http://localhost:8000/admin-panel.html" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
                             <i class="fas fa-cog"></i> Dashboard
                         </a>`;
                     }
@@ -339,7 +339,14 @@
         // Cargar operaciones activas
         async function loadActiveOperations() {
             try {
-                const response = await fetch(`${API_BASE_URL}/operations/active`);
+                const response = await fetch(`${API_BASE_URL}/operations/active`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
+                });
                 if (!response.ok) throw new Error('Error al cargar operaciones activas');
                 
                 const operations = await response.json();
@@ -355,7 +362,14 @@
         // Cargar operaciones pasadas
         async function loadPastOperations() {
             try {
-                const response = await fetch(`${API_BASE_URL}/operations/past`);
+                const response = await fetch(`${API_BASE_URL}/operations/past`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
+                });
                 if (!response.ok) throw new Error('Error al cargar operaciones pasadas');
                 
                 const operations = await response.json();
@@ -562,7 +576,7 @@
                     </div>
 
                     <div class="welcome-actions">
-                        ${isAdmin ? `<button class="btn welcome-btn welcome-btn-primary" onclick="window.location.href='admin-panel.html'">
+                        ${isAdmin ? `<button class="btn welcome-btn welcome-btn-primary" onclick="window.location.href='http://localhost:8000/admin-panel.html'">
                             <i class="fas fa-gauge-high"></i> Ir al dashboard
                         </button>` : ''}
                         <button class="btn welcome-btn welcome-btn-secondary" onclick="document.getElementById('welcomeModal').remove()">

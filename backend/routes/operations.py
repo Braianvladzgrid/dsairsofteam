@@ -5,6 +5,7 @@ from schemas import sanitize_input
 from datetime import datetime
 from uuid import uuid4
 import bleach
+import base64
 
 operations_bp = Blueprint('operations', __name__, url_prefix='/api/operations')
 
@@ -29,6 +30,45 @@ def _clean_list(value):
             if text:
                 cleaned.append(text)
     return cleaned
+
+
+def _validate_and_normalize_image(image_value: str, max_bytes: int = 2 * 1024 * 1024):
+    """Valida imagen enviada como data URI (base64) y aplica límite de tamaño.
+
+    - Permite URLs o strings vacíos sin validación de tamaño.
+    - Para data URI: valida que sea image/* y que el binario decodificado sea <= max_bytes.
+    """
+    if not image_value or not isinstance(image_value, str):
+        return image_value
+
+    value = image_value.strip()
+    if not value:
+        return ''
+
+    if not value.startswith('data:'):
+        # URL u otro formato: no podemos validar tamaño aquí
+        return value
+
+    # data:[<mediatype>][;base64],<data>
+    if ',' not in value:
+        raise ValueError('Invalid data URI image format')
+
+    header, b64data = value.split(',', 1)
+    header_lower = header.lower()
+    if not header_lower.startswith('data:image/'):
+        raise ValueError('Only image data URIs are allowed')
+    if ';base64' not in header_lower:
+        raise ValueError('Image data URI must be base64 encoded')
+
+    try:
+        raw = base64.b64decode(b64data, validate=True)
+    except Exception:
+        raise ValueError('Invalid base64 image data')
+
+    if len(raw) > max_bytes:
+        raise ValueError(f'Image too large. Max size is {max_bytes} bytes')
+
+    return value
 
 
 @operations_bp.route('/active', methods=['GET'])
@@ -104,16 +144,28 @@ def create_operation(current_user):
     if data.get('type') not in valid_types:
         return jsonify({'error': f'Invalid operation type. Must be one of {valid_types}'}), 400
 
+    valid_statuses = ['active', 'completed', 'cancelled']
+    if data.get('status') and data.get('status') not in valid_statuses:
+        return jsonify({'error': f'Invalid status. Must be one of {valid_statuses}'}), 400
+
     try:
         start_date = datetime.fromisoformat(data['start_date'].replace('Z', '+00:00'))
         end_date = None
         if data.get('end_date'):
             end_date = datetime.fromisoformat(data['end_date'].replace('Z', '+00:00'))
 
+        image_value = data.get('image', '')
+        if image_value:
+            try:
+                image_value = _validate_and_normalize_image(image_value)
+            except ValueError as ve:
+                msg = str(ve)
+                return jsonify({'error': msg}), (413 if 'too large' in msg.lower() else 400)
+
         operation = Operation(
             id=str(uuid4()),
             type=data['type'],
-            title=data.get('title', ''),
+            title=_clean_text(data.get('title', '')),
             description=_clean_text(data.get('description', '')),
             lore=_clean_text(data.get('lore', '')),
             requirements=_clean_list(data.get('requirements')),
@@ -121,12 +173,12 @@ def create_operation(current_user):
             price=float(data.get('price', 0)),
             start_date=start_date,
             end_date=end_date,
-            location=data.get('location', ''),
+            location=_clean_text(data.get('location', '')),
             max_participants=data.get('max_participants'),
             status=data.get('status', 'active'),
             is_active=bool(data.get('is_active', True)),
-            notes=data.get('notes', ''),
-            image=data.get('image', ''),
+            notes=_clean_text(data.get('notes', '')),
+            image=image_value,
             created_by=current_user.id
         )
 
@@ -165,7 +217,7 @@ def update_operation(current_user, id):
         operation.type = data['type']
 
     if 'title' in data:
-        operation.title = data['title']
+        operation.title = _clean_text(data['title'])
     if 'description' in data:
         operation.description = _clean_text(data['description'])
     if 'lore' in data:
@@ -177,17 +229,24 @@ def update_operation(current_user, id):
     if 'price' in data:
         operation.price = float(data['price'])
     if 'location' in data:
-        operation.location = data['location']
+        operation.location = _clean_text(data['location'])
     if 'max_participants' in data:
         operation.max_participants = data['max_participants']
     if 'status' in data:
+        valid_statuses = ['active', 'completed', 'cancelled']
+        if data['status'] not in valid_statuses:
+            return jsonify({'error': f'Invalid status. Must be one of {valid_statuses}'}), 400
         operation.status = data['status']
     if 'is_active' in data:
         operation.is_active = data['is_active']
     if 'notes' in data:
-        operation.notes = data['notes']
+        operation.notes = _clean_text(data['notes'])
     if 'image' in data:
-        operation.image = data['image']
+        try:
+            operation.image = _validate_and_normalize_image(data['image'])
+        except ValueError as ve:
+            msg = str(ve)
+            return jsonify({'error': msg}), (413 if 'too large' in msg.lower() else 400)
     if 'start_date' in data:
         operation.start_date = datetime.fromisoformat(data['start_date'].replace('Z', '+00:00'))
     if 'end_date' in data:
@@ -267,7 +326,7 @@ def join_operation(current_user, operation_id):
             id=str(uuid4()),
             user_id=current_user.id,
             operation_id=operation_id,
-            status='registered',
+            status='pending',
             joined_at=datetime.utcnow()
         )
 
@@ -345,11 +404,19 @@ def update_attendance(current_user, operation_id, participation_id):
     if participation.operation_id != operation_id:
         return jsonify({'error': 'Participation does not belong to this operation'}), 400
 
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     new_status = data.get('status')
 
-    if new_status not in ['registered', 'attended', 'cancelled']:
-        return jsonify({'error': 'Invalid status. Must be: registered, attended, or cancelled'}), 400
+    # Nuevos estados: pending (neutro), attended, absent.
+    # Compatibilidad: registered -> pending, cancelled -> absent.
+    allowed = ['pending', 'attended', 'absent', 'registered', 'cancelled']
+    if new_status not in allowed:
+        return jsonify({'error': 'Invalid status. Must be: pending, attended, or absent'}), 400
+
+    if new_status == 'registered':
+        new_status = 'pending'
+    elif new_status == 'cancelled':
+        new_status = 'absent'
 
     try:
         participation.status = new_status

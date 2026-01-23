@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash
-from models import User, AdminNote, Participation, db
+from models import User, AdminNote, Participation, Operation, db
 from routes.auth import token_required, admin_required
+from datetime import datetime
+from schemas import sanitize_input, sanitize_string, UserRegisterSchema, UserUpdateSchema
 
 users_bp = Blueprint('users', __name__, url_prefix='/api/users')
 
@@ -20,24 +22,24 @@ def get_all_users(current_user):
 @admin_required
 def create_user(current_user):
     """Crear un nuevo usuario (solo admin)"""
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
-    # Validar datos requeridos
-    if not data.get('name') or not data.get('email') or not data.get('password'):
-        return jsonify({'error': 'name, email, and password are required'}), 400
+    validated_data, errors = sanitize_input(data, UserRegisterSchema)
+    if errors:
+        return jsonify({'error': 'Validation error', 'details': errors}), 400
 
     # Verificar si el email ya existe
-    if User.query.filter_by(email=data.get('email')).first():
+    if User.query.filter_by(email=validated_data.get('email')).first():
         return jsonify({'error': 'Email already exists'}), 409
 
     # Crear nuevo usuario
     new_user = User(
-        name=data.get('name'),
-        email=data.get('email'),
-        password=generate_password_hash(data.get('password')),
-        phone=data.get('phone', ''),
-        user_type=data.get('user_type', 'buyer'),
-        is_admin=data.get('is_admin', False)
+        name=validated_data.get('name'),
+        email=validated_data.get('email'),
+        password=generate_password_hash(validated_data.get('password')),
+        phone=validated_data.get('phone', ''),
+        user_type=validated_data.get('user_type', 'buyer'),
+        is_admin=bool(data.get('is_admin', False))
     )
 
     db.session.add(new_user)
@@ -72,18 +74,16 @@ def update_user(current_user, id):
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
-    # No permitir cambios de email por este endpoint
-    data.pop('email', None)
-    # No permitir cambio de password por PATCH (se haría en endpoint separado)
-    data.pop('password', None)
-    # Solo admin puede cambiar is_admin
-    if not current_user.is_admin:
-        data.pop('is_admin', None)
+    # Validar + sanitizar solo campos permitidos (anti-mass-assignment)
+    validated_data, errors = sanitize_input(data, UserUpdateSchema)
+    if errors:
+        return jsonify({'error': 'Validation error', 'details': errors}), 400
 
-    for key, value in data.items():
-        if hasattr(user, key):
+    allowed_fields = {'name', 'phone', 'address', 'city', 'state', 'zipcode'}
+    for key, value in validated_data.items():
+        if key in allowed_fields:
             setattr(user, key, value)
 
     db.session.commit()
@@ -152,11 +152,19 @@ def get_user_stats(current_user, id):
     # Contar por estado
     total_registered = len(participations)
     total_attended = len([p for p in participations if p.status == 'attended'])
-    total_cancelled = len([p for p in participations if p.status == 'cancelled'])
-    total_pending = len([p for p in participations if p.status == 'registered'])
-    
-    # Calcular juegos en los que NO participó (se registró pero canceló o no asistió)
-    total_not_participated = total_cancelled
+    # Compat: cancelled (legacy) cuenta como absent
+    total_absent = len([p for p in participations if p.status in ('absent', 'cancelled')])
+    total_pending = len([p for p in participations if p.status in ('pending', 'registered')])
+
+    # Métricas globales (solo operaciones pasadas): participó vs no participó
+    now = datetime.utcnow()
+    total_past_operations = Operation.query.filter(Operation.start_date < now).count()
+    past_attended = (
+        Participation.query.join(Operation, Participation.operation_id == Operation.id)
+        .filter(Participation.user_id == id, Operation.start_date < now, Participation.status == 'attended')
+        .count()
+    )
+    past_not_participated = max(0, total_past_operations - past_attended)
 
     return jsonify({
         'user_id': id,
@@ -164,8 +172,10 @@ def get_user_stats(current_user, id):
         'total_registered': total_registered,
         'total_attended': total_attended,
         'total_pending': total_pending,
-        'total_cancelled': total_cancelled,
-        'total_not_participated': total_not_participated,
+        'total_absent': total_absent,
+        'past_operations_total': total_past_operations,
+        'past_participated': past_attended,
+        'past_not_participated': past_not_participated,
         'participation_rate': round((total_attended / total_registered * 100) if total_registered > 0 else 0, 2)
     }), 200
 
@@ -195,15 +205,20 @@ def create_admin_note(current_user, id):
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     if not data.get('note'):
+        return jsonify({'error': 'Note text is required'}), 400
+
+    note_text = sanitize_string(data.get('note'))
+
+    if not note_text.strip():
         return jsonify({'error': 'Note text is required'}), 400
 
     note = AdminNote(
         user_id=id,
         admin_id=current_user.id,
-        note=data.get('note')
+        note=note_text
     )
 
     db.session.add(note)

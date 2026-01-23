@@ -150,7 +150,15 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/users/${userId}`);
+                const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    credentials: 'include'
+                });
 
                 if (!response.ok) {
                     throw new Error('Usuario no encontrado');

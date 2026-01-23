@@ -472,7 +472,7 @@
             if (token && user.id) {
                 let adminLink = '';
                 if (user.is_admin) {
-                    adminLink = `<a href="admin-panel.html" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+                    adminLink = `<a href="http://localhost:8000/admin-panel.html" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-cog"></i> Dashboard
                     </a>`;
                 }
@@ -550,11 +550,16 @@
 
             const token = localStorage.getItem('token');
             const headers = {
+                'Content-Type': 'application/json',
                 'Accept': 'application/json'
             };
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
-            const response = await fetch(`${API_BASE_URL}/operations/${encodeURIComponent(opId)}`, { headers });
+            const response = await fetch(`${API_BASE_URL}/operations/${encodeURIComponent(opId)}`, { 
+                method: 'GET',
+                headers,
+                credentials: 'include'
+            });
             if (!response.ok) {
                 alert('No se pudo cargar la operación.');
                 window.location.href = 'index.html';
@@ -608,7 +613,12 @@
         async function cargarParticipantes(operationId) {
             try {
                 const response = await fetch(`${API_BASE_URL}/operations/${encodeURIComponent(operationId)}/participants`, {
-                    headers: { 'Accept': 'application/json' }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json' 
+                    },
+                    credentials: 'include'
                 });
 
                 if (!response.ok) {
@@ -689,10 +699,13 @@
             const opId = getOperacionId();
             try {
                 const checkResponse = await fetch(`${API_BASE_URL}/operations/${encodeURIComponent(opId)}/is-registered`, {
+                    method: 'GET',
                     headers: {
+                        'Content-Type': 'application/json',
                         'Accept': 'application/json',
                         'Authorization': `Bearer ${token}`
-                    }
+                    },
+                    credentials: 'include'
                 });
 
                 if (checkResponse.ok) {
@@ -814,6 +827,7 @@
                         'Accept': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         accept_requirements: true,
                         accept_rules: true
@@ -862,9 +876,11 @@
             const response = await fetch(`${API_BASE_URL}/operations/${encodeURIComponent(opId)}/leave`, {
                 method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`
-                }
+                },
+                credentials: 'include'
             });
 
             if (!response.ok) {
@@ -890,10 +906,13 @@
             }
 
             const response = await fetch(`${API_BASE_URL}/operations/${encodeURIComponent(opId)}/is-registered`, {
+                method: 'GET',
                 headers: {
+                    'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`
-                }
+                },
+                credentials: 'include'
             });
 
             if (!response.ok) {

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from models import db
 from config import config
@@ -18,14 +18,28 @@ def create_app(config_name=None):
     # Initialize extensions
     db.init_app(app)
     
-    # Configurar CORS correctamente para todas las rutas
+    # Configurar CORS correctamente para todas las rutas - Permitir requests del frontend
     CORS(app, 
-         resources={r"/api/*": {
-             "origins": ["http://localhost:8080", "http://localhost:8000", "http://localhost:5000", "http://127.0.0.1:8080", "http://127.0.0.1:8000", "http://127.0.0.1:5000"],
-             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-             "allow_headers": ["Content-Type", "Authorization"],
-             "supports_credentials": True
-         }})
+         origins=["http://localhost:8080", "http://localhost:8000", "http://localhost:5000", 
+                  "http://127.0.0.1:8080", "http://127.0.0.1:8000", "http://127.0.0.1:5000",
+                  "http://0.0.0.0:8000", "http://0.0.0.0:5000"],
+         methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+         allow_headers=["Content-Type", "Authorization", "Accept"],
+         supports_credentials=True,
+         expose_headers=["Content-Type", "Authorization"])
+
+    # Security headers for API responses
+    @app.after_request
+    def add_security_headers(response):
+        response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+        response.headers.setdefault('X-Frame-Options', 'DENY')
+        response.headers.setdefault('Referrer-Policy', 'no-referrer')
+        response.headers.setdefault('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
+
+        # APIs should not be cached by default
+        if request.path.startswith('/api/'):
+            response.headers.setdefault('Cache-Control', 'no-store')
+        return response
 
     # Register blueprints
     app.register_blueprint(auth_bp)
@@ -48,6 +62,10 @@ def create_app(config_name=None):
         db.session.rollback()
         return jsonify({'error': 'Internal server error'}), 500
 
+    @app.errorhandler(413)
+    def request_too_large(error):
+        return jsonify({'error': 'Request too large'}), 413
+
     # Create tables
     with app.app_context():
         db.create_all()
@@ -59,4 +77,6 @@ if __name__ == '__main__':
     app = create_app()
     port = int(os.getenv('PORT', 5000))
     print(f'✅ Server running on http://localhost:{port}')
-    app.run(host='0.0.0.0', port=port, debug=True)
+    # Debug solo si se habilita explícitamente
+    debug = os.getenv('FLASK_DEBUG', '').lower() in ('1', 'true', 'yes')
+    app.run(host='0.0.0.0', port=port, debug=debug)

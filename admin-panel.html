@@ -7,6 +7,19 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --admin-footer-height: 64px;
+        }
+
+        /* En el panel admin evitamos el logout en el header (queda fijo en footer) */
+        header .auth-buttons {
+            display: none;
+        }
+
+        body {
+            padding-bottom: calc(var(--admin-footer-height) + env(safe-area-inset-bottom));
+        }
+
         .admin-container {
             display: grid;
             grid-template-columns: 220px 1fr;
@@ -87,6 +100,10 @@
             margin-top: 1.5rem;
         }
 
+        .table-responsive table {
+            min-width: 720px;
+        }
+
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -141,6 +158,7 @@
         .action-buttons {
             display: flex;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
         .btn-small {
@@ -266,12 +284,59 @@
             padding-bottom: 1rem;
         }
 
+        /* Mantener el botón de cerrar visible mientras se scrollea el modal */
+        .modal-inner .modal-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 2;
+        }
+
         .modal-close {
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: var(--gray);
+            color: #111827;
+            padding: 0.25rem 0.6rem;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #ef4444;
+        }
+
+        /* Footer fijo con acciones globales */
+        .admin-footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: calc(var(--admin-footer-height) + env(safe-area-inset-bottom));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #e5e7eb;
+            z-index: 9000;
+            backdrop-filter: blur(6px);
+        }
+
+        .admin-footer .admin-footer-left {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #111827;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .admin-footer .admin-footer-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .empty-state {
@@ -289,27 +354,42 @@
         @media (max-width: 768px) {
             .admin-container {
                 grid-template-columns: 1fr;
-                margin-top: 4rem;
-            }
-
-            .admin-sidebar {
-                position: static;
-                display: flex;
+                margin-top: 5.5rem;
                 gap: 1rem;
                 padding: 1rem;
             }
 
+            .admin-sidebar {
+                position: static;
+                padding: 0.75rem;
+                overflow-x: auto;
+            }
+
             .admin-sidebar nav {
                 flex-direction: row;
-                gap: 0;
-                width: 100%;
+                gap: 0.5rem;
+                width: max-content;
             }
 
             .admin-sidebar a {
-                flex: 1;
                 justify-content: center;
-                padding: 0.5rem;
+                padding: 0.65rem 0.9rem;
                 font-size: 0.85rem;
+                white-space: nowrap;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+            }
+
+            .admin-sidebar a:hover,
+            .admin-sidebar a.active {
+                border-left-color: transparent;
+                border-bottom-color: var(--white);
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
             }
 
             .table-responsive {
@@ -322,11 +402,23 @@
             }
 
             .action-buttons {
-                flex-direction: column;
+                flex-direction: row;
+                flex-wrap: wrap;
             }
 
             .stats-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .modal-inner {
+                width: 96%;
+                padding: 1rem;
+                max-height: 86vh;
+            }
+
+            .modal-close {
+                font-size: 1.9rem;
+                padding: 0.25rem 0.75rem;
             }
         }
     </style>
@@ -350,6 +442,8 @@
             </div>
         </nav>
     </header>
+
+    <div class="admin-container">
 
         <!-- SIDEBAR -->
         <aside class="admin-sidebar">
@@ -425,7 +519,7 @@
                     <table class="data-table" id="operaciones-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>Título</th>
                                 <th>Tipo</th>
                                 <th>Precio</th>
                                 <th>Estado</th>
@@ -481,6 +575,21 @@
             </section>
         </main>
     </div>
+
+    <footer class="admin-footer" id="adminFooter">
+        <div class="admin-footer-left">
+            <i class="fas fa-shield-alt"></i>
+            <span id="adminFooterLabel">Panel Admin</span>
+        </div>
+        <div class="admin-footer-right">
+            <a href="index.html" class="btn btn-secondary">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <button type="button" class="btn btn-secondary" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+        </div>
+    </footer>
 
     <!-- MODAL OPERACIÓN -->
     <div id="operationModal" class="form-modal">
@@ -554,8 +663,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="op-image">Imagen (URL)</label>
-                    <input type="text" id="op-image" placeholder="URL de la imagen">
+                    <label for="op-image">Imagen (Archivo o URL)</label>
+                    <input type="file" id="op-image-file" accept="image/*" style="margin-bottom: 0.5rem;">
+                    <small style="color: #6b7280; display: block; margin-bottom: 0.5rem;">Máximo 2MB - formatos: JPG, PNG, GIF</small>
+                    <input type="text" id="op-image" placeholder="O pega una URL de imagen">
+                    <div id="image-preview" style="margin-top: 0.5rem; display: none;">
+                        <img id="preview-img" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #e5e7eb;">
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -763,22 +877,77 @@
 
     <script>
         const API_BASE_URL = 'http://localhost:5000/api';
-        const token = localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        function safeJsonParse(value, fallback = null) {
+            try {
+                if (value === null || value === undefined || value === '') return fallback;
+                return JSON.parse(value);
+            } catch (e) {
+                return fallback;
+            }
+        }
 
-        // Verificar si es admin
-        if (!token || !user.is_admin) {
-            alert('❌ Acceso denegado. Solo administradores pueden acceder.');
-            window.location.href = 'index.html';
+        let token = localStorage.getItem('token');
+        let user = safeJsonParse(localStorage.getItem('user'), null);
+
+        async function requireAdminSession() {
+            token = localStorage.getItem('token');
+            user = safeJsonParse(localStorage.getItem('user'), null);
+
+            if (!token) {
+                alert('❌ Sesión expirada. Inicia sesión nuevamente.');
+                window.location.href = 'index.html';
+                return false;
+            }
+
+            // Si el user no está en localStorage o no es admin, validar contra backend
+            if (!user || !user.id || !user.is_admin) {
+                try {
+                    const meRes = await fetch(`${API_BASE_URL}/auth/me`, {
+                        method: 'GET',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${token}` 
+                        },
+                        credentials: 'include'
+                    });
+
+                    if (!meRes.ok) {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        alert('❌ No se pudo validar la sesión. Vuelve a iniciar sesión.');
+                        window.location.href = 'index.html';
+                        return false;
+                    }
+
+                    const me = await meRes.json();
+                    localStorage.setItem('user', JSON.stringify(me));
+                    user = me;
+                } catch (e) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    alert('❌ Error de conexión. Verifica que el backend esté corriendo.');
+                    window.location.href = 'index.html';
+                    return false;
+                }
+            }
+
+            if (!user || !user.is_admin) {
+                alert('❌ Acceso denegado. Solo administradores pueden acceder.');
+                window.location.href = 'index.html';
+                return false;
+            }
+
+            return true;
         }
 
         // Actualizar header con información de usuario
         function checkSession() {
             const token = localStorage.getItem('token');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const user = safeJsonParse(localStorage.getItem('user'), null);
             const authButtons = document.querySelector('.auth-buttons');
 
-            if (token && user.id && authButtons) {
+            if (token && user && user.id && authButtons) {
                 authButtons.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 1rem; color: var(--text);">
                         <span><i class="fas fa-user"></i> ${user.name} ${user.is_admin ? '<span style="color: var(--accent); font-weight: bold;">[ADMIN]</span>' : ''}</span>
@@ -823,13 +992,43 @@
         async function loadDashboard() {
             try {
                 const opsResponse = await fetch(`${API_BASE_URL}/operations/admin`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
+                if (!opsResponse.ok) {
+                    const err = await opsResponse.json().catch(() => ({}));
+                    if (opsResponse.status === 401 || opsResponse.status === 403) {
+                        alert('❌ No autorizado. Inicia sesión como admin.');
+                        logout();
+                        return;
+                    }
+                    throw new Error(err.error || 'Error cargando operaciones');
+                }
                 const operations = await opsResponse.json();
 
                 const usersResponse = await fetch(`${API_BASE_URL}/users`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
+                if (!usersResponse.ok) {
+                    const err = await usersResponse.json().catch(() => ({}));
+                    if (usersResponse.status === 401 || usersResponse.status === 403) {
+                        alert('❌ No autorizado. Inicia sesión como admin.');
+                        logout();
+                        return;
+                    }
+                    throw new Error(err.error || 'Error cargando usuarios');
+                }
                 const users = await usersResponse.json();
 
                 // Actualizar estadísticas
@@ -839,27 +1038,51 @@
                 const activeOps = operations.filter(op => op.is_active).length;
                 document.getElementById('stat-active-ops').textContent = activeOps;
 
-                const pending = operations.filter(op => op.status === 'pending').length;
-                const progress = operations.filter(op => op.status === 'in-progress').length;
+                // Estados válidos en backend: active, completed, cancelled
+                const active = operations.filter(op => op.status === 'active').length;
                 const completed = operations.filter(op => op.status === 'completed').length;
                 const cancelled = operations.filter(op => op.status === 'cancelled').length;
 
-                document.getElementById('stat-pending').textContent = pending;
-                document.getElementById('stat-progress').textContent = progress;
+                document.getElementById('stat-pending').textContent = active;
+                document.getElementById('stat-progress').textContent = 0;
                 document.getElementById('stat-completed').textContent = completed;
                 document.getElementById('stat-cancelled').textContent = cancelled;
             } catch (error) {
                 console.error('Error cargando dashboard:', error);
+                alert(`❌ Error cargando dashboard: ${error.message || 'Error desconocido'}`);
             }
         }
 
         // OPERACIONES
         async function loadOperations() {
             try {
+                // Validar sesión admin + asegurar token actualizado
+                const ok = await requireAdminSession();
+                if (!ok) return;
+                token = localStorage.getItem('token');
+
                 const response = await fetch(`${API_BASE_URL}/operations/admin`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
-                const operations = await response.json();
+
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    if (response.status === 401 || response.status === 403) {
+                        alert('❌ No autorizado. Inicia sesión como admin.');
+                        logout();
+                        return;
+                    }
+                    throw new Error(err.error || 'Error cargando operaciones');
+                }
+
+                const operationsPayload = await response.json();
+                const operations = Array.isArray(operationsPayload) ? operationsPayload : [];
 
                 const tbody = document.getElementById('operaciones-body');
                 tbody.innerHTML = '';
@@ -886,11 +1109,22 @@
                     };
                     const typeLabel = typeLabels[op.type] || op.type;
 
+                    const statusLabel = op.status === 'completed' ? 'Completada' : op.status === 'cancelled' ? 'Cancelada' : 'Activa';
+
                     row.innerHTML = `
                         <td>${op.title}</td>
                         <td>${typeLabel}</td>
                         <td>$${op.price}</td>
-                        <td><span class="badge badge-${statusColor}">${op.status}</span></td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                                <span class="badge badge-${statusColor}">${statusLabel}</span>
+                                <select onchange="updateOperationStatus('${op.id}', this.value)" style="padding:0.3rem 0.5rem; border-radius:6px; border:1px solid #d1d5db; font-size:0.85rem;">
+                                    <option value="active" ${op.status === 'active' ? 'selected' : ''}>Activa</option>
+                                    <option value="completed" ${op.status === 'completed' ? 'selected' : ''}>Completada</option>
+                                    <option value="cancelled" ${op.status === 'cancelled' ? 'selected' : ''}>Cancelada</option>
+                                </select>
+                            </div>
+                        </td>
                         <td>${activeBadge}</td>
                         <td>${new Date(op.start_date).toLocaleDateString('es-AR')}</td>
                         <td>
@@ -914,15 +1148,75 @@
                 });
             } catch (error) {
                 console.error('Error cargando operaciones:', error);
+                alert(`❌ Error cargando operaciones: ${error.message || 'Error desconocido'}`);
             }
         }
+
+        // UX: cierre garantizado de modales (overlay click + Escape)
+        (function bindAdminModalCloseHandlers() {
+            const modalToCloseFn = {
+                operationModal: closeOperationForm,
+                userModal: closeUserForm,
+                attendanceModal: closeAttendanceModal,
+                userDetailsModal: closeUserDetailsModal
+            };
+
+            Object.keys(modalToCloseFn).forEach((id) => {
+                const modal = document.getElementById(id);
+                if (!modal) return;
+                modal.addEventListener('click', function (e) {
+                    if (e.target === modal) {
+                        try {
+                            modalToCloseFn[id]();
+                        } catch (_) {
+                            // no-op
+                        }
+                    }
+                });
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key !== 'Escape') return;
+
+                // Cerrar el modal más prioritario que esté abierto
+                const order = ['userDetailsModal', 'attendanceModal', 'userModal', 'operationModal'];
+                for (const id of order) {
+                    const modal = document.getElementById(id);
+                    if (!modal) continue;
+                    const isOpen = modal.classList.contains('active') || modal.style.display === 'flex';
+                    if (isOpen) {
+                        try {
+                            modalToCloseFn[id]();
+                        } catch (_) {
+                            // no-op
+                        }
+                        break;
+                    }
+                }
+            });
+        })();
 
         // USUARIOS
         async function loadUsers() {
             try {
                 const response = await fetch(`${API_BASE_URL}/users`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    if (response.status === 401 || response.status === 403) {
+                        alert('❌ No autorizado. Inicia sesión como admin.');
+                        logout();
+                        return;
+                    }
+                    throw new Error(err.error || 'Error cargando usuarios');
+                }
                 const users = await response.json();
 
                 const tbody = document.getElementById('usuarios-body');
@@ -969,7 +1263,16 @@
                 });
             } catch (error) {
                 console.error('Error cargando usuarios:', error);
+                alert(`❌ Error cargando usuarios: ${error.message || 'Error desconocido'}`);
             }
+        }
+
+        // Inicialización
+        async function initAdminPanel() {
+            const ok = await requireAdminSession();
+            if (!ok) return;
+            checkSession();
+            loadDashboard();
         }
 
 
@@ -980,6 +1283,12 @@
             document.getElementById('operationModalTitle').textContent = 'Nueva Operación';
             document.getElementById('op-submit-btn').textContent = 'Crear Operación';
             document.getElementById('operation-form').removeAttribute('data-edit-id');
+
+            // Reset imagen
+            imageBase64 = '';
+            const fileInput = document.getElementById('op-image-file');
+            if (fileInput) fileInput.value = '';
+            document.getElementById('image-preview').style.display = 'none';
             document.getElementById('operationModal').classList.add('active');
         }
 
@@ -990,7 +1299,13 @@
         async function editOperation(id) {
             try {
                 const response = await fetch(`${API_BASE_URL}/operations/${id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
                 
                 if (!response.ok) {
@@ -1012,6 +1327,20 @@
                 document.getElementById('op-status').value = operation.status;
                 document.getElementById('op-is-active').checked = operation.is_active;
                 document.getElementById('op-notes').value = operation.notes || '';
+
+                // Imagen: si viene como data URI, mostrar preview y setear base64
+                imageBase64 = '';
+                const fileInput = document.getElementById('op-image-file');
+                if (fileInput) fileInput.value = '';
+
+                if (operation.image && typeof operation.image === 'string' && operation.image.startsWith('data:image/')) {
+                    imageBase64 = operation.image;
+                    document.getElementById('preview-img').src = operation.image;
+                    document.getElementById('image-preview').style.display = 'block';
+                    document.getElementById('op-image').value = '';
+                } else {
+                    document.getElementById('image-preview').style.display = 'none';
+                }
 
                 // Convertir arrays a strings para requisitos y reglas
                 if (operation.requirements && Array.isArray(operation.requirements)) {
@@ -1046,7 +1375,12 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/operations/${id}/toggle-active`, {
                     method: 'PATCH',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
 
                 if (response.ok) {
@@ -1064,18 +1398,42 @@
             if (!confirm('¿Estás seguro de eliminar esta operación? Esta acción no se puede deshacer.')) {
                 return;
             }
-
             try {
-                const response = await fetch(`${API_BASE_URL}/operations/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                // No existe /toggle-active en backend: usar PUT cambiando is_active
+                const getRes = await fetch(`${API_BASE_URL}/operations/${id}`, {
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
 
-                if (response.ok) {
+                if (!getRes.ok) {
+                    alert('❌ Error al obtener la operación');
+                    return;
+                }
+
+                const op = await getRes.json();
+
+                const updateRes = await fetch(`${API_BASE_URL}/operations/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ is_active: !op.is_active })
+                });
+
+                if (updateRes.ok) {
                     alert('✓ Operación eliminada');
                     loadOperations();
                 } else {
-                    alert('❌ Error al eliminar operación');
+                    const err = await updateRes.json().catch(() => ({}));
+                    alert(`❌ Error al actualizar: ${err.error || 'Error desconocido'}`);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -1086,11 +1444,21 @@
         // ASISTENCIA - MOSTRAR MODAL
         async function showAttendanceList(operationId, operationTitle) {
             document.getElementById('attendance-op-title').textContent = operationTitle;
-            document.getElementById('attendanceModal').style.display = 'flex';
+            const modal = document.getElementById('attendanceModal');
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
             
             try {
                 const response = await fetch(`${API_BASE_URL}/operations/${operationId}/participants`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
 
                 if (!response.ok) {
@@ -1122,9 +1490,11 @@
             let totalAbsent = 0;
 
             participants.forEach((p, index) => {
-                if (p.status === 'registered') totalPending++;
-                if (p.status === 'attended') totalAttended++;
-                if (p.status === 'cancelled') totalAbsent++;
+                // Backend expone: pending | attended | absent (mantiene compatibilidad si llega registered/cancelled)
+                const normalizedStatus = (p.status === 'registered') ? 'pending' : (p.status === 'cancelled' ? 'absent' : p.status);
+                if (normalizedStatus === 'pending') totalPending++;
+                if (normalizedStatus === 'attended') totalAttended++;
+                if (normalizedStatus === 'absent') totalAbsent++;
 
                 const row = document.createElement('tr');
                 const registeredDate = new Date(p.joined_at).toLocaleDateString('es-AR', {
@@ -1148,23 +1518,23 @@
                     <td style="text-align: center;">
                         <div style="display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap;">
                             <button 
-                                class="btn-small ${p.status === 'registered' ? 'btn-info' : ''}" 
-                                onclick="updateAttendance('${operationId}', '${p.id}', 'registered')"
-                                style="padding: 0.35rem 0.7rem; font-size: 0.85rem; ${p.status === 'registered' ? 'font-weight: bold; background: #3b82f6; color: white;' : 'background: #e5e7eb; color: #6b7280;'}"
+                                class="btn-small ${normalizedStatus === 'pending' ? 'btn-info' : ''}" 
+                                onclick="updateAttendance('${operationId}', '${p.id}', 'pending')"
+                                style="padding: 0.35rem 0.7rem; font-size: 0.85rem; ${normalizedStatus === 'pending' ? 'font-weight: bold; background: #3b82f6; color: white;' : 'background: #e5e7eb; color: #6b7280;'}"
                                 title="Marcar como pendiente">
                                 <i class="fas fa-clock"></i> Pendiente
                             </button>
                             <button 
-                                class="btn-small ${p.status === 'attended' ? 'btn-success' : ''}" 
+                                class="btn-small ${normalizedStatus === 'attended' ? 'btn-success' : ''}" 
                                 onclick="updateAttendance('${operationId}', '${p.id}', 'attended')"
-                                style="padding: 0.35rem 0.7rem; font-size: 0.85rem; ${p.status === 'attended' ? 'font-weight: bold; background: #10b981; color: white;' : 'background: #e5e7eb; color: #6b7280;'}"
+                                style="padding: 0.35rem 0.7rem; font-size: 0.85rem; ${normalizedStatus === 'attended' ? 'font-weight: bold; background: #10b981; color: white;' : 'background: #e5e7eb; color: #6b7280;'}"
                                 title="Marcar como asistió">
                                 <i class="fas fa-check"></i> Asistió
                             </button>
                             <button 
-                                class="btn-small ${p.status === 'cancelled' ? 'btn-danger' : ''}" 
-                                onclick="updateAttendance('${operationId}', '${p.id}', 'cancelled')"
-                                style="padding: 0.35rem 0.7rem; font-size: 0.85rem; ${p.status === 'cancelled' ? 'font-weight: bold; background: #ef4444; color: white;' : 'background: #e5e7eb; color: #6b7280;'}"
+                                class="btn-small ${normalizedStatus === 'absent' ? 'btn-danger' : ''}" 
+                                onclick="updateAttendance('${operationId}', '${p.id}', 'absent')"
+                                style="padding: 0.35rem 0.7rem; font-size: 0.85rem; ${normalizedStatus === 'absent' ? 'font-weight: bold; background: #ef4444; color: white;' : 'background: #e5e7eb; color: #6b7280;'}"
                                 title="Marcar como no asistió">
                                 <i class="fas fa-times"></i> No Asistió
                             </button>
@@ -1190,15 +1560,23 @@
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
+                    credentials: 'include',
                     body: JSON.stringify({ status })
                 });
 
                 if (response.ok) {
                     // Recargar lista para actualizar visualmente
                     const participantsResponse = await fetch(`${API_BASE_URL}/operations/${operationId}/participants`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
+                        method: 'GET',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${token}` 
+                        },
+                        credentials: 'include'
                     });
                     const participants = await participantsResponse.json();
                     renderAttendanceList(participants, operationId);
@@ -1215,7 +1593,11 @@
         }
 
         function closeAttendanceModal() {
-            document.getElementById('attendanceModal').style.display = 'none';
+            const modal = document.getElementById('attendanceModal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 200);
         }
 
         async function deleteOperation(id) {
@@ -1236,6 +1618,92 @@
             }
         }
 
+        // Manejo de imagen - File upload con validación de 2MB
+        let imageBase64 = '';
+
+        // Si el admin pega una URL, priorizar URL y limpiar base64
+        document.getElementById('op-image').addEventListener('input', (e) => {
+            const val = (e.target.value || '').trim();
+            if (val.length > 0) {
+                imageBase64 = '';
+                const fileInput = document.getElementById('op-image-file');
+                if (fileInput) fileInput.value = '';
+                document.getElementById('image-preview').style.display = 'none';
+            }
+        });
+
+        async function updateOperationStatus(operationId, status) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/${operationId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    alert(`❌ No se pudo actualizar el estado: ${err.error || 'Error desconocido'}`);
+                    return;
+                }
+
+                // Mantener badges/orden actualizado
+                loadOperations();
+            } catch (e) {
+                console.error('Error actualizando estado:', e);
+                alert('❌ Error de conexión al actualizar estado');
+            }
+        }
+        
+        document.getElementById('op-image-file').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            
+            if (!file) {
+                imageBase64 = '';
+                document.getElementById('image-preview').style.display = 'none';
+                return;
+            }
+            
+            // Validar tamaño (2MB máximo)
+            const maxSizeBytes = 2 * 1024 * 1024; // 2MB
+            if (file.size > maxSizeBytes) {
+                alert(`❌ La imagen es demasiado grande (${(file.size / (1024 * 1024)).toFixed(2)}MB).\nEl tamaño máximo es 2MB.`);
+                e.target.value = ''; // Limpiar input
+                imageBase64 = '';
+                document.getElementById('image-preview').style.display = 'none';
+                return;
+            }
+            
+            // Validar tipo de archivo
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                alert('❌ Formato de imagen no válido.\nUsa JPG, PNG, GIF o WEBP.');
+                e.target.value = '';
+                imageBase64 = '';
+                document.getElementById('image-preview').style.display = 'none';
+                return;
+            }
+            
+            // Convertir a base64
+            try {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    imageBase64 = event.target.result;
+                    
+                    // Mostrar preview
+                    document.getElementById('preview-img').src = imageBase64;
+                    document.getElementById('image-preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Error al leer imagen:', error);
+                alert('❌ Error al procesar la imagen');
+                imageBase64 = '';
+            }
+        });
+
         document.getElementById('operation-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -1250,7 +1718,8 @@
                 status: document.getElementById('op-status').value,
                 is_active: document.getElementById('op-is-active').checked,
                 notes: document.getElementById('op-notes').value || undefined,
-                image: document.getElementById('op-image').value || undefined,
+                // Prioridad: archivo -> base64 (validado), si no: URL
+                image: imageBase64 || document.getElementById('op-image').value || undefined,
                 start_date: new Date(document.getElementById('op-start-date').value).toISOString(),
                 end_date: document.getElementById('op-end-date').value ? new Date(document.getElementById('op-end-date').value).toISOString() : undefined
             };
@@ -1322,7 +1791,13 @@
         async function editUser(id) {
             try {
                 const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
 
                 if (!response.ok) {
@@ -1360,7 +1835,12 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/users/${id}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
 
                 if (response.ok) {
@@ -1381,8 +1861,10 @@
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'Authorization': `Bearer ${token}` 
-                    }
+                    },
+                    credentials: 'include'
                 });
 
                 if (response.ok) {
@@ -1412,19 +1894,37 @@
             try {
                 // Cargar información del usuario
                 const userResponse = await fetch(`${API_BASE_URL}/users/${userId}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
                 const userData = await userResponse.json();
                 
                 // Cargar estadísticas
                 const statsResponse = await fetch(`${API_BASE_URL}/users/${userId}/stats`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
                 const stats = await statsResponse.json();
                 
                 // Cargar notas
                 const notesResponse = await fetch(`${API_BASE_URL}/users/${userId}/admin-notes`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
                 const notes = await notesResponse.json();
                 
@@ -1433,7 +1933,8 @@
                 document.getElementById('user-stat-total').textContent = stats.total_registered || 0;
                 document.getElementById('user-stat-attended').textContent = stats.total_attended || 0;
                 document.getElementById('user-stat-pending').textContent = stats.total_pending || 0;
-                document.getElementById('user-stat-cancelled').textContent = stats.total_cancelled || 0;
+                // Preferir métrica global de operaciones pasadas si está disponible
+                document.getElementById('user-stat-cancelled').textContent = (stats.past_not_participated ?? stats.total_absent ?? 0);
                 document.getElementById('user-stat-rate').textContent = (stats.participation_rate || 0) + '%';
                 
                 // Renderizar notas
@@ -1516,15 +2017,23 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
+                    credentials: 'include',
                     body: JSON.stringify({ note: noteText })
                 });
                 
                 if (response.ok) {
                     // Recargar notas
                     const notesResponse = await fetch(`${API_BASE_URL}/users/${currentUserDetailsId}/admin-notes`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
+                        method: 'GET',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${token}` 
+                        },
+                        credentials: 'include'
                     });
                     const notes = await notesResponse.json();
                     
@@ -1547,13 +2056,24 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/users/${currentUserDetailsId}/admin-notes/${noteId}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    credentials: 'include'
                 });
                 
                 if (response.ok) {
                     // Recargar notas
                     const notesResponse = await fetch(`${API_BASE_URL}/users/${currentUserDetailsId}/admin-notes`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
+                        method: 'GET',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${token}` 
+                        },
+                        credentials: 'include'
                     });
                     const notes = await notesResponse.json();
                     renderAdminNotes(notes);
@@ -1631,8 +2151,7 @@
 
         // Cargar dashboard al iniciar
         document.addEventListener('DOMContentLoaded', () => {
-            checkSession();
-            loadDashboard();
+            initAdminPanel();
         });
     </script>
 </body>
