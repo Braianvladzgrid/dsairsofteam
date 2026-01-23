@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Admin - Death Squad Airsoft</title>
+    <title>Panel Admin - Death Squad Airsoft Team</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -311,8 +311,8 @@
     <!-- HEADER -->
     <header>
         <div class="logo">
-            <i class="fas fa-gun"></i>
-            <a href="index.html" class="logo-text">Death Squad Airsoft</a>
+            <img class="logo-icon" src="https://drive.google.com/uc?export=view&id=1RElY2JP2l4sF6bh9v0U-engQ2LGtU3Ea" alt="Death Squad Airsoft Team">
+            <a href="index.html" class="logo-text">Death Squad Airsoft Team</a>
         </div>
         <nav id="navbar">
             <ul>
@@ -327,7 +327,6 @@
         </nav>
     </header>
 
-    <div class="admin-container">
         <!-- SIDEBAR -->
         <aside class="admin-sidebar">
             <nav>
@@ -463,12 +462,17 @@
     <div id="operationModal" class="form-modal">
         <div class="modal-inner">
             <div class="modal-header">
-                <h3>Nueva Operación</h3>
+                <h3 id="operationModalTitle">Nueva Operación</h3>
                 <button class="modal-close" onclick="closeOperationForm()">&times;</button>
             </div>
             <form id="operation-form">
                 <div class="form-group">
-                    <label for="op-type">Tipo de Operación</label>
+                    <label for="op-title">Título/Nombre de la Operación *</label>
+                    <input type="text" id="op-title" placeholder="Ej: Operación Táctico Sur" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-type">Tipo de Operación *</label>
                     <select id="op-type" required>
                         <option value="">-- Selecciona --</option>
                         <option value="milsim">Milsim</option>
@@ -481,32 +485,78 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="op-price">Precio</label>
+                    <label for="op-description">Descripción</label>
+                    <textarea id="op-description" placeholder="Descripción de la operación" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-lore">Lore/Escenario</label>
+                    <textarea id="op-lore" placeholder="Trasfondo y lore de la operación" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-price">Precio *</label>
                     <input type="number" id="op-price" placeholder="0.00" step="0.01" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="op-start-date">Fecha de Inicio</label>
-                    <input type="date" id="op-start-date" required>
+                    <label for="op-location">Ubicación/Lugar</label>
+                    <input type="text" id="op-location" placeholder="Ej: Campo Táctico Los Pinos">
+                </div>
+
+                <div class="form-group">
+                    <label for="op-start-date">Fecha de Inicio *</label>
+                    <input type="datetime-local" id="op-start-date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-end-date">Fecha de Fin</label>
+                    <input type="datetime-local" id="op-end-date">
+                </div>
+
+                <div class="form-group">
+                    <label for="op-max-participants">Máximo de Participantes</label>
+                    <input type="number" id="op-max-participants" placeholder="Ej: 40" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="op-requirements">Requisitos (separados por coma)</label>
+                    <textarea id="op-requirements" placeholder="Ej: Réplica airsoft, protección ocular, munición" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-rules">Reglas (separadas por coma)</label>
+                    <textarea id="op-rules" placeholder="Ej: No headshots, Zona segura delimitada" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-image">Imagen (URL)</label>
+                    <input type="text" id="op-image" placeholder="URL de la imagen">
                 </div>
 
                 <div class="form-group">
                     <label for="op-status">Estado</label>
-                    <select id="op-status" required>
-                        <option value="pending">Pendiente</option>
-                        <option value="in-progress">En Progreso</option>
+                    <select id="op-status">
+                        <option value="active">Activa</option>
                         <option value="completed">Completada</option>
                         <option value="cancelled">Cancelada</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="op-notes">Notas</label>
-                    <textarea id="op-notes" placeholder="Notas adicionales" rows="3"></textarea>
+                    <label>
+                        <input type="checkbox" id="op-is-active" checked>
+                        <span>Mostrar en listado público</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="op-notes">Notas internas</label>
+                    <textarea id="op-notes" placeholder="Notas adicionales" rows="2"></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
-                    <i class="fas fa-save"></i> Crear Operación
+                    <i class="fas fa-save"></i> <span id="op-submit-btn">Crear Operación</span>
                 </button>
             </form>
         </div>
@@ -617,7 +667,7 @@
         // DASHBOARD
         async function loadDashboard() {
             try {
-                const opsResponse = await fetch(`${API_BASE_URL}/operations/admin/all`, {
+                const opsResponse = await fetch(`${API_BASE_URL}/operations/admin`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const operations = await opsResponse.json();
@@ -651,7 +701,7 @@
         // OPERACIONES
         async function loadOperations() {
             try {
-                const response = await fetch(`${API_BASE_URL}/operations/admin/all`, {
+                const response = await fetch(`${API_BASE_URL}/operations/admin`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const operations = await response.json();
@@ -669,20 +719,32 @@
 
                 operations.forEach(op => {
                     const row = document.createElement('tr');
-                    const statusColor = op.status === 'completed' ? 'success' : op.status === 'pending' ? 'warning' : 'info';
+                    const statusColor = op.status === 'completed' ? 'success' : op.status === 'cancelled' ? 'danger' : 'info';
                     const activeBadge = op.is_active ? '<span class="badge badge-success">✓ Activa</span>' : '<span class="badge badge-danger">✗ Inactiva</span>';
+                    const typeLabels = {
+                        'milsim': '🎖️ Milsim',
+                        'picado': '🎯 Picado',
+                        'especial': '⭐ Especial',
+                        'realista': '🔫 Realista',
+                        'historica': '📜 Histórica',
+                        'semi-milsim': '🎖️ Semi Milsim'
+                    };
+                    const typeLabel = typeLabels[op.type] || op.type;
 
                     row.innerHTML = `
-                        <td>${op.id.substring(0, 8)}...</td>
-                        <td>${op.type === 'rent' ? '🏠 Alquiler' : '🏡 Venta'}</td>
+                        <td>${op.title}</td>
+                        <td>${typeLabel}</td>
                         <td>$${op.price}</td>
                         <td><span class="badge badge-${statusColor}">${op.status}</span></td>
                         <td>${activeBadge}</td>
                         <td>${new Date(op.start_date).toLocaleDateString('es-AR')}</td>
                         <td>
                             <div class="action-buttons">
+                                <button class="btn-small btn-edit" onclick="editOperation('${op.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
                                 <button class="btn-small btn-toggle ${op.is_active ? '' : 'inactive'}" onclick="toggleOperation('${op.id}')">
-                                    ${op.is_active ? '▼' : '▲'} Toggle
+                                    ${op.is_active ? '▼' : '▲'}
                                 </button>
                                 <button class="btn-small btn-delete" onclick="deleteOperation('${op.id}')">
                                     <i class="fas fa-trash"></i>
@@ -752,11 +814,71 @@
 
         // FUNCIONES DE OPERACIONES
         function openOperationForm() {
+            // Limpiar formulario para nueva operación
+            document.getElementById('operation-form').reset();
+            document.getElementById('operationModalTitle').textContent = 'Nueva Operación';
+            document.getElementById('op-submit-btn').textContent = 'Crear Operación';
+            document.getElementById('operation-form').removeAttribute('data-edit-id');
             document.getElementById('operationModal').classList.add('active');
         }
 
         function closeOperationForm() {
             document.getElementById('operationModal').classList.remove('active');
+        }
+
+        async function editOperation(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    alert('❌ Error al cargar operación');
+                    return;
+                }
+
+                const operation = await response.json();
+
+                // Llenar formulario con datos existentes
+                document.getElementById('op-title').value = operation.title;
+                document.getElementById('op-type').value = operation.type;
+                document.getElementById('op-description').value = operation.description || '';
+                document.getElementById('op-lore').value = operation.lore || '';
+                document.getElementById('op-price').value = operation.price;
+                document.getElementById('op-location').value = operation.location || '';
+                document.getElementById('op-max-participants').value = operation.max_participants || '';
+                document.getElementById('op-image').value = operation.image || '';
+                document.getElementById('op-status').value = operation.status;
+                document.getElementById('op-is-active').checked = operation.is_active;
+                document.getElementById('op-notes').value = operation.notes || '';
+
+                // Convertir arrays a strings para requisitos y reglas
+                if (operation.requirements && Array.isArray(operation.requirements)) {
+                    document.getElementById('op-requirements').value = operation.requirements.join(', ');
+                }
+                if (operation.rules && Array.isArray(operation.rules)) {
+                    document.getElementById('op-rules').value = operation.rules.join(', ');
+                }
+
+                // Convertir fechas ISO a formato datetime-local
+                if (operation.start_date) {
+                    const startDate = new Date(operation.start_date);
+                    document.getElementById('op-start-date').value = startDate.toISOString().slice(0, 16);
+                }
+                if (operation.end_date) {
+                    const endDate = new Date(operation.end_date);
+                    document.getElementById('op-end-date').value = endDate.toISOString().slice(0, 16);
+                }
+
+                // Actualizar modal
+                document.getElementById('operationModalTitle').textContent = 'Editar Operación';
+                document.getElementById('op-submit-btn').textContent = 'Actualizar Operación';
+                document.getElementById('operation-form').setAttribute('data-edit-id', id);
+                document.getElementById('operationModal').classList.add('active');
+            } catch (error) {
+                console.error('Error cargando operación:', error);
+                alert('❌ Error al cargar operación');
+            }
         }
 
         async function toggleOperation(id) {
@@ -799,16 +921,45 @@
             e.preventDefault();
 
             const operationData = {
+                title: document.getElementById('op-title').value,
                 type: document.getElementById('op-type').value,
-                price: document.getElementById('op-price').value,
-                start_date: document.getElementById('op-start-date').value,
+                description: document.getElementById('op-description').value || undefined,
+                lore: document.getElementById('op-lore').value || undefined,
+                price: parseFloat(document.getElementById('op-price').value),
+                location: document.getElementById('op-location').value || undefined,
+                max_participants: document.getElementById('op-max-participants').value ? parseInt(document.getElementById('op-max-participants').value) : undefined,
                 status: document.getElementById('op-status').value,
-                notes: document.getElementById('op-notes').value
+                is_active: document.getElementById('op-is-active').checked,
+                notes: document.getElementById('op-notes').value || undefined,
+                image: document.getElementById('op-image').value || undefined,
+                start_date: new Date(document.getElementById('op-start-date').value).toISOString(),
+                end_date: document.getElementById('op-end-date').value ? new Date(document.getElementById('op-end-date').value).toISOString() : undefined
             };
 
+            // Convertir requisitos y reglas a arrays
+            const requirements = document.getElementById('op-requirements').value
+                .split(',')
+                .map(r => r.trim())
+                .filter(r => r.length > 0);
+            if (requirements.length > 0) {
+                operationData.requirements = requirements;
+            }
+
+            const rules = document.getElementById('op-rules').value
+                .split(',')
+                .map(r => r.trim())
+                .filter(r => r.length > 0);
+            if (rules.length > 0) {
+                operationData.rules = rules;
+            }
+
             try {
-                const response = await fetch(`${API_BASE_URL}/operations`, {
-                    method: 'POST',
+                const editId = document.getElementById('operation-form').getAttribute('data-edit-id');
+                const method = editId ? 'PUT' : 'POST';
+                const url = editId ? `${API_BASE_URL}/operations/${editId}` : `${API_BASE_URL}/operations`;
+
+                const response = await fetch(url, {
+                    method: method,
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
@@ -817,13 +968,19 @@
                 });
 
                 if (response.ok) {
-                    alert('✓ Operación creada');
+                    const successMsg = editId ? '✓ Operación actualizada' : '✓ Operación creada';
+                    alert(successMsg);
                     closeOperationForm();
                     document.getElementById('operation-form').reset();
                     loadOperations();
+                } else {
+                    const data = await response.json();
+                    console.error('Respuesta de error:', data);
+                    alert(`❌ Error: ${data.error || data.message || 'No se pudo procesar la operación'}`);
                 }
             } catch (error) {
                 console.error('Error:', error);
+                alert('❌ Error de conexión');
             }
         });
 
@@ -903,7 +1060,10 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/users/${id}/toggle-admin`, {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    }
                 });
 
                 if (response.ok) {
@@ -916,10 +1076,11 @@
                 } else {
                     const data = await response.json();
                     alert(`❌ Error: ${data.error || 'No se pudo actualizar el usuario'}`);
+                    console.error('Error response:', data);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error al actualizar usuario');
+                alert(`❌ Error al actualizar usuario: ${error.message}`);
             }
         }
 

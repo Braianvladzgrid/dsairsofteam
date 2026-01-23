@@ -97,6 +97,9 @@ class Operation(db.Model):
     type = db.Column(db.String(50), nullable=False)  # milsim, picado, especial, realista, historica, semi-milsim
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
+    lore = db.Column(db.Text)
+    requirements = db.Column(db.JSON, default=list)
+    rules = db.Column(db.JSON, default=list)
     price = db.Column(db.Numeric(15, 2), nullable=False, default=0)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime)
@@ -119,6 +122,9 @@ class Operation(db.Model):
             'type': self.type,
             'title': self.title,
             'description': self.description,
+            'lore': self.lore,
+            'requirements': self.requirements or [],
+            'rules': self.rules or [],
             'price': float(self.price),
             'start_date': self.start_date.isoformat() if self.start_date else None,
             'end_date': self.end_date.isoformat() if self.end_date else None,

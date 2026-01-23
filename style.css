@@ -147,6 +147,14 @@ nav a:hover {
     gap: 1rem;
 }
 
+/* Logo image icon (replaces fa-gun) */
+.logo img.logo-icon {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    display: inline-block;
+}
+
 .btn {
     padding: 0.6rem 1.2rem;
     border: none;

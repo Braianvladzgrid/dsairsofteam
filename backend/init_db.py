@@ -7,12 +7,35 @@ from app import create_app
 from models import db, User
 from werkzeug.security import generate_password_hash
 
+
+def _ensure_operation_columns():
+    """Migración liviana para SQLite sin Alembic."""
+    try:
+        result = db.session.execute(db.text("PRAGMA table_info(operations)"))
+        existing_cols = {row[1] for row in result.fetchall()}
+
+        desired = {
+            'lore': "ALTER TABLE operations ADD COLUMN lore TEXT",
+            'requirements': "ALTER TABLE operations ADD COLUMN requirements JSON",
+            'rules': "ALTER TABLE operations ADD COLUMN rules JSON",
+        }
+
+        for col, ddl in desired.items():
+            if col not in existing_cols:
+                db.session.execute(db.text(ddl))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        # Si falla (p.ej. DB distinta), no rompemos init.
+        pass
+
 def init_db():
     app = create_app()
     
     with app.app_context():
         # Crear todas las tablas
         db.create_all()
+        _ensure_operation_columns()
         print("✓ Tablas de base de datos creadas")
         
         # Verificar si existe admin

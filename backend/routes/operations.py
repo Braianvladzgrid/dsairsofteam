@@ -4,8 +4,31 @@ from routes.auth import token_required, admin_required
 from schemas import sanitize_input
 from datetime import datetime
 from uuid import uuid4
+import bleach
 
 operations_bp = Blueprint('operations', __name__, url_prefix='/api/operations')
+
+
+def _clean_text(value):
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        return value
+    return bleach.clean(value, tags=[], strip=True)
+
+
+def _clean_list(value):
+    if value is None:
+        return []
+    if not isinstance(value, list):
+        return []
+    cleaned = []
+    for item in value:
+        if isinstance(item, str):
+            text = _clean_text(item).strip()
+            if text:
+                cleaned.append(text)
+    return cleaned
 
 
 @operations_bp.route('/active', methods=['GET'])
@@ -33,13 +56,22 @@ def get_past_operations():
     return jsonify([o.to_dict() for o in operations]), 200
 
 
-@operations_bp.route('/', methods=['GET'])
+@operations_bp.route('', methods=['GET'], strict_slashes=False)
 def get_all_operations():
     """Obtener todas las operaciones (público) - sin autenticación"""
     operations = Operation.query.filter(
         Operation.is_active == True
     ).order_by(Operation.start_date.asc()).all()
 
+    return jsonify([o.to_dict() for o in operations]), 200
+
+
+@operations_bp.route('/admin', methods=['GET'], strict_slashes=False)
+@token_required
+@admin_required
+def get_all_operations_admin(current_user):
+    """Obtener todas las operaciones (admin) - incluye activas e inactivas"""
+    operations = Operation.query.order_by(Operation.start_date.asc()).all()
     return jsonify([o.to_dict() for o in operations]), 200
 
 
@@ -54,7 +86,7 @@ def get_operation(id):
     return jsonify(operation.to_dict(include_participants=True)), 200
 
 
-@operations_bp.route('/', methods=['POST'])
+@operations_bp.route('', methods=['POST'], strict_slashes=False)
 @token_required
 @admin_required
 def create_operation(current_user):
@@ -82,14 +114,17 @@ def create_operation(current_user):
             id=str(uuid4()),
             type=data['type'],
             title=data.get('title', ''),
-            description=data.get('description', ''),
+            description=_clean_text(data.get('description', '')),
+            lore=_clean_text(data.get('lore', '')),
+            requirements=_clean_list(data.get('requirements')),
+            rules=_clean_list(data.get('rules')),
             price=float(data.get('price', 0)),
             start_date=start_date,
             end_date=end_date,
             location=data.get('location', ''),
             max_participants=data.get('max_participants'),
             status=data.get('status', 'active'),
-            is_active=True,
+            is_active=bool(data.get('is_active', True)),
             notes=data.get('notes', ''),
             image=data.get('image', ''),
             created_by=current_user.id
@@ -132,7 +167,13 @@ def update_operation(current_user, id):
     if 'title' in data:
         operation.title = data['title']
     if 'description' in data:
-        operation.description = data['description']
+        operation.description = _clean_text(data['description'])
+    if 'lore' in data:
+        operation.lore = _clean_text(data['lore'])
+    if 'requirements' in data:
+        operation.requirements = _clean_list(data['requirements'])
+    if 'rules' in data:
+        operation.rules = _clean_list(data['rules'])
     if 'price' in data:
         operation.price = float(data['price'])
     if 'location' in data:
@@ -205,7 +246,15 @@ def join_operation(current_user, operation_id):
     ).first()
 
     if existing:
-        return jsonify({'error': 'Already registered in this operation'}), 409
+        return jsonify({
+            'error': 'Ya estás registrado en esta operación',
+            'message': 'Already registered in this operation',
+            'participation': existing.to_dict()
+        }), 409
+
+    data = request.get_json(silent=True) or {}
+    if not data.get('accept_rules') or not data.get('accept_requirements'):
+        return jsonify({'error': 'You must accept rules and requirements'}), 400
 
     # Verificar límite de participantes
     if operation.max_participants:

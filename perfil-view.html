@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario - Death Squad Airsoft Team</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .public-profile {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 2rem auto;
+        }
+
+        .public-avatar {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--light-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(45, 80, 22, 0.2);
+        }
+
+        .public-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .public-profile h2 {
+            text-align: center;
+            color: var(--dark-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .public-profile .badge {
+            text-align: center;
+            display: block;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-details {
+            border-top: 1px solid var(--light-green);
+            padding-top: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+
+        .detail-value {
+            color: var(--black);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 2rem auto;
+            max-width: 500px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: var(--dark-green);
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER FIJO -->
+    <header>
+        <div class="logo">
+            <img class="logo-icon" src="https://drive.google.com/uc?export=view&id=1RElY2JP2l4sF6bh9v0U-engQ2LGtU3Ea" alt="Death Squad Airsoft Team">
+            <a href="index.html" class="logo-text">Death Squad Airsoft Team</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="container">
+            <div id="profileContent">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando perfil...
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Death Squad Airsoft Team. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+
+        // Obtener ID de usuario del parámetro URL
+        function getUserIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        // Cargar perfil público del usuario
+        async function loadPublicProfile() {
+            const userId = getUserIdFromURL();
+            const contentDiv = document.getElementById('profileContent');
+
+            if (!userId) {
+                contentDiv.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i> ID de usuario inválido
+                    </div>
+                    <div class="back-link">
+                        <a href="index.html" class="btn btn-primary">
+                            <i class="fas fa-arrow-left"></i> Volver al Inicio
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${userId}`);
+
+                if (!response.ok) {
+                    throw new Error('Usuario no encontrado');
+                }
+
+                const user = await response.json();
+
+                // Renderizar perfil público
+                contentDiv.innerHTML = `
+                    <div class="public-profile">
+                        <div class="public-avatar">
+                            ${user.photo 
+                                ? `<img src="${user.photo}" alt="${user.name}">` 
+                                : `<i class="fas fa-user"></i>`
+                            }
+                        </div>
+
+                        <h2>${user.name}</h2>
+                        <div class="badge ${user.is_admin ? 'badge-danger' : 'badge-info'}">
+                            ${user.is_admin ? '👑 Administrador' : '🎖️ Jugador'}
+                        </div>
+
+                        <div class="profile-details">
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-envelope"></i> Email:</span>
+                                <span class="detail-value">${user.email}</span>
+                            </div>
+
+                            ${user.phone ? `
+                                <div class="detail-item">
+                                    <span class="detail-label"><i class="fas fa-phone"></i> Teléfono:</span>
+                                    <span class="detail-value">${user.phone}</span>
+                                </div>
+                            ` : ''}
+
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-user-tag"></i> Tipo:</span>
+                                <span class="detail-value">${user.user_type === 'player' ? '🎮 Jugador' : user.user_type === 'agent' ? '🎖️ Agente' : '👤 Comprador'}</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-calendar"></i> Miembro desde:</span>
+                                <span class="detail-value">${new Date(user.created_at).toLocaleDateString('es-AR')}</span>
+                            </div>
+                        </div>
+
+                        <div class="back-link">
+                            <a href="index.html" class="btn btn-primary">
+                                <i class="fas fa-arrow-left"></i> Volver al Inicio
+                            </a>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                contentDiv.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i> No se pudo cargar el perfil
+                    </div>
+                    <div class="back-link">
+                        <a href="index.html" class="btn btn-primary">
+                            <i class="fas fa-arrow-left"></i> Volver al Inicio
+                        </a>
+                    </div>
+                `;
+            }
+        }
+
+        // Cargar perfil cuando se cargue la página
+        document.addEventListener('DOMContentLoaded', loadPublicProfile);
+    </script>
+</body>
+</html>

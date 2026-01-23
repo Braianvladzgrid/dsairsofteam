@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle Operación - Death Squad Airsoft</title>
+    <title>Detalle Operación - Death Squad Airsoft Team</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -148,6 +148,86 @@
             display: block;
         }
 
+        .participante-card {
+            background: var(--white);
+            border-left: 4px solid var(--green);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .participante-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .participante-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--light-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--white);
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .participante-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .participante-name {
+            font-weight: 600;
+            color: var(--dark-green);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .participante-email {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+
+        .participante-status {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: var(--light-green);
+            color: var(--dark-green);
+        }
+
+        .participante-qr-btn {
+            margin-top: 1rem;
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--green);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .participante-qr-btn:hover {
+            background: var(--dark-green);
+        }
+
         @media (max-width: 768px) {
             .detalle-header {
                 padding: 2rem 1rem;
@@ -179,8 +259,8 @@
     <!-- HEADER FIJO -->
     <header>
         <div class="logo">
-            <i class="fas fa-gun"></i>
-            <a href="index.html" class="logo-text">Death Squad Airsoft</a>
+            <img class="logo-icon" src="https://drive.google.com/uc?export=view&id=1RElY2JP2l4sF6bh9v0U-engQ2LGtU3Ea" alt="Death Squad Airsoft Team">
+            <a href="index.html" class="logo-text">Death Squad Airsoft Team</a>
         </div>
         <button id="menu-toggle" class="menu-toggle" style="display: none;">
             <i class="fas fa-bars"></i>
@@ -198,13 +278,11 @@
                 <li><a href="perfil.html">Mi Perfil</a></li>
             </ul>
             <div class="auth-buttons">
-                <button class="btn btn-secondary" onclick="showLoginModal()">Iniciar Sesión</button>
+                <button class="btn btn-secondary" onclick="openLoginModal()">Iniciar Sesión</button>
                 <a href="registro.html" class="btn btn-primary">Registrarse</a>
             </div>
         </nav>
     </header>
-
-    <main>
         <div class="container">
             <!-- HEADER DE OPERACIÓN -->
             <div class="detalle-header">
@@ -249,6 +327,14 @@
                 <i class="fas fa-check-circle"></i> <strong>¡Ya estás inscripto!</strong> Tu participación está confirmada para esta operación.
             </div>
 
+            <!-- LISTA DE PARTICIPANTES INSCRITOS -->
+            <div class="seccion">
+                <h2><i class="fas fa-users"></i> Participantes Inscritos</h2>
+                <div id="participantes-lista" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <p style="grid-column: 1 / -1; text-align: center; color: #999;">Cargando participantes...</p>
+                </div>
+            </div>
+
             <!-- DESCRIPCIÓN Y HISTORIA -->
             <div class="seccion">
                 <h2><i class="fas fa-book"></i> Historia / Lore</h2>
@@ -262,7 +348,7 @@
             <!-- REQUISITOS -->
             <div class="seccion">
                 <h2><i class="fas fa-list-check"></i> Requisitos y Equipamiento</h2>
-                <ul class="requisitos-list">
+                <ul class="requisitos-list" id="requirements-list">
                     <li><i class="fas fa-check"></i> Réplica de airsoft funcional (FPS mínimo: 350)</li>
                     <li><i class="fas fa-check"></i> Protección ocular (goggles certificados)</li>
                     <li><i class="fas fa-check"></i> Chaleco o pechera táctico</li>
@@ -276,7 +362,7 @@
             <!-- REGLAS -->
             <div class="seccion">
                 <h2><i class="fas fa-gavel"></i> Reglas de la Operación</h2>
-                <ul class="requisitos-list">
+                <ul class="requisitos-list" id="rules-list">
                     <li><i class="fas fa-check"></i> Los disparos a corta distancia deben ser identificados (30 metros mínimo para zona de castigo)</li>
                     <li><i class="fas fa-check"></i> Al ser "eliminado", debes esperar 5 minutos antes de reingresar a zona activa</li>
                     <li><i class="fas fa-check"></i> Las armas se deben asegurar antes de abandonar el área</li>
@@ -303,7 +389,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>&copy; 2026 Death Squad Airsoft. Todos los derechos reservados.</p>
+        <p>&copy; 2026 Death Squad Airsoft Team. Todos los derechos reservados.</p>
         <p style="font-size: 0.9rem; margin-top: 0.5rem;">
             <a href="#" style="color: var(--accent); text-decoration: none;">Términos y Condiciones</a> | 
             <a href="#" style="color: var(--accent); text-decoration: none;">Privacidad</a> | 
@@ -311,7 +397,38 @@
         </p>
     </footer>
 
+    <!-- Modal de aceptación para inscripción -->
+    <div id="acceptModal" class="modal" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="modal-content" style="width: 520px; max-width: 92vw; padding: 1.5rem; background: #f7f7f8; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.35); color: #111827;">
+            <div style="display:flex; align-items:center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem;">
+                <h2 style="margin:0; font-size: 1.2rem;">Confirmar inscripción</h2>
+                <button type="button" onclick="closeAcceptModal()" style="border:none; background: transparent; font-size: 1.6rem; line-height: 1; cursor:pointer; color: #6b7280;">&times;</button>
+            </div>
+            <p style="margin: 0 0 1rem 0; color: #374151; font-size: 0.95rem;">
+                Para inscribirte, debés aceptar los requisitos y las reglas de la operación.
+            </p>
+            <div style="display:grid; gap: 0.75rem;">
+                <label style="display:flex; align-items:flex-start; gap: 0.6rem; cursor: pointer;">
+                    <input id="accept-requirements" type="checkbox" style="margin-top: 0.15rem;">
+                    <span><strong>Acepto los requisitos y equipamiento</strong></span>
+                </label>
+                <label style="display:flex; align-items:flex-start; gap: 0.6rem; cursor: pointer;">
+                    <input id="accept-rules" type="checkbox" style="margin-top: 0.15rem;">
+                    <span><strong>Acepto las reglas de la operación</strong></span>
+                </label>
+            </div>
+            <div id="accept-error" style="display:none; margin-top: 0.75rem; color: #b42318; font-size: 0.9rem;"></div>
+            <div style="display:flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+                <button type="button" class="btn btn-secondary" onclick="closeAcceptModal()" style="padding: 0.75rem 1rem;">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="confirmJoin()" style="padding: 0.75rem 1rem;">Inscribirme</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        let currentOperation = null;
+
         // Actualizar header con información de usuario
         function checkSession() {
             const token = localStorage.getItem('token');
@@ -346,137 +463,390 @@
             window.location.href = 'index.html';
         }
 
-        // BASE DE DATOS DE OPERACIONES
-        const operaciones = {
-            'OP-2026-001': {
-                titulo: 'OPERACIÓN TÁCTICA URBANA',
-                fecha: '28 de Febrero, 2026',
-                hora: '10:00 - 16:00',
-                ubicacion: 'Zona Industrial, Montevideo',
-                tipo: 'Team Deathmatch',
-                cupos: { disponibles: 12, totales: 40 },
-                descripcion: 'Una célula de operativos hostiles ha tomado control de un complejo industrial estratégico. Tu equipo debe trabajar en coordinación para recuperar el control del área. La comunicación y la estrategia serán claves para el éxito de esta misión táctica.',
-                requisitos: [
-                    'Réplica de airsoft funcional (FPS mínimo: 350)',
-                    'Protección ocular (goggles certificados)',
-                    'Chaleco o pechera táctico',
-                    'Mínimo 2 cargadores',
-                    'Batería completamente cargada o gas suficiente',
-                    'Botella de agua (obligatorio)',
-                    'Documento de identidad'
-                ]
-            },
-            'OP-2026-002': {
-                titulo: 'RESCATE VIP',
-                fecha: '15 de Marzo, 2026',
-                hora: '09:00 - 15:00',
-                ubicacion: 'Campo Las Piedras',
-                tipo: 'Objetivo Especial',
-                cupos: { disponibles: 5, totales: 40 },
-                descripcion: 'Una misión de rescate de alto perfil. Los operadores deben infiltrarse en territorio enemigo, localizar al objetivo y extraerlo sin ser detectados.',
-                requisitos: [
-                    'Réplica de airsoft funcional (FPS mínimo: 350)',
-                    'Protección ocular (goggles certificados)',
-                    'Ropa de camuflaje o táctica',
-                    'Mínimo 3 cargadores',
-                    'Batería completamente cargada',
-                    'Botella de agua (obligatorio)',
-                    'Documento de identidad'
-                ]
-            },
-            'OP-2026-003': {
-                titulo: 'CAPTURA DE BANDERA',
-                fecha: '22 de Marzo, 2026',
-                hora: '11:00 - 17:00',
-                ubicacion: 'Centro Urbano, Canelones',
-                tipo: 'CTF',
-                cupos: { disponibles: 35, totales: 40 },
-                descripcion: 'Dos equipos compiten para capturar la bandera del equipo opuesto. Un clásico del airsoft que requiere coordinación, estrategia y trabajo en equipo.',
-                requisitos: [
-                    'Réplica de airsoft funcional (FPS mínimo: 350)',
-                    'Protección ocular (goggles certificados)',
-                    'Equipo táctico o casual cómodo',
-                    'Mínimo 2 cargadores',
-                    'Batería completamente cargada o gas suficiente',
-                    'Botella de agua (obligatorio)',
-                    'Documento de identidad'
-                ]
-            }
-        };
+        function openLoginModal() {
+            window.location.href = 'index.html?login=1';
+        }
 
         // OBTENER PARÁMETROS DE URL
         function getOperacionId() {
             const params = new URLSearchParams(window.location.search);
-            return params.get('id') || 'OP-2026-001';
+            return params.get('id');
         }
 
-        // CARGAR DATOS DE OPERACIÓN
-        function cargarOperacion() {
-            const opId = getOperacionId();
-            const op = operaciones[opId];
-
-            if (op) {
-                document.getElementById('cod-operacion').textContent = opId;
-                document.getElementById('titulo-operacion').textContent = op.titulo;
-                document.getElementById('fecha-operacion').textContent = op.fecha;
-                document.getElementById('hora-operacion').textContent = op.hora;
-                document.getElementById('ubicacion-operacion').textContent = op.ubicacion;
-                document.getElementById('tipo-juego').textContent = op.tipo;
-                document.getElementById('cupos-disponibles').textContent = op.cupos.disponibles;
-                document.getElementById('cupos-totales').textContent = op.cupos.totales;
-                document.getElementById('descripcion-operacion').textContent = op.descripcion;
-
-                // Calcular porcentaje
-                const ocupados = op.cupos.totales - op.cupos.disponibles;
-                const porcentaje = Math.round((ocupados / op.cupos.totales) * 100);
-                document.getElementById('porcentaje-cupos').textContent = porcentaje + '%';
-                document.getElementById('barra-progreso').style.width = porcentaje + '%';
-
-                // Renderizar requisitos
-                const listaRequisitos = document.querySelector('.requisitos-list');
-                listaRequisitos.innerHTML = '';
-                op.requisitos.forEach(req => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<i class="fas fa-check"></i> ${req}`;
-                    listaRequisitos.appendChild(li);
-                });
+        function formatDateEs(date) {
+            try {
+                return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+            } catch {
+                return '';
             }
         }
 
-        // INSCRIBIRSE
-        function inscribirse() {
-            // Verificar si el usuario está registrado (simulado)
-            const usuarioRegistrado = localStorage.getItem('usuarioRegistrado');
-            
-            if (!usuarioRegistrado) {
-                alert('⚠️ Debes registrarte primero para inscribirte a la operación.');
-                window.location.href = 'registro.html';
+        function formatTime(date) {
+            try {
+                return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            } catch {
+                return '';
+            }
+        }
+
+        function renderList(items, listId) {
+            const ul = document.getElementById(listId);
+            if (!ul) return;
+            ul.innerHTML = '';
+            if (!items || items.length === 0) {
+                const li = document.createElement('li');
+                li.innerHTML = '<i class="fas fa-check"></i> Sin información';
+                ul.appendChild(li);
+                return;
+            }
+            items.forEach(text => {
+                const li = document.createElement('li');
+                li.innerHTML = `<i class="fas fa-check"></i> ${text}`;
+                ul.appendChild(li);
+            });
+        }
+
+        async function cargarOperacion() {
+            const opId = getOperacionId();
+            if (!opId) {
+                alert('Falta el id de la operación.');
+                window.location.href = 'index.html';
                 return;
             }
 
-            alert('✓ ¡Inscripción exitosa! Te has registrado correctamente para esta operación.');
-            localStorage.setItem('inscripcion_' + getOperacionId(), 'true');
-            mostrarEstadoInscripcion();
+            const token = localStorage.getItem('token');
+            const headers = {
+                'Accept': 'application/json'
+            };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const response = await fetch(`${API_BASE_URL}/operations/${encodeURIComponent(opId)}`, { headers });
+            if (!response.ok) {
+                alert('No se pudo cargar la operación.');
+                window.location.href = 'index.html';
+                return;
+            }
+            const op = await response.json();
+            currentOperation = op;
+
+            document.getElementById('cod-operacion').textContent = op.id;
+            document.getElementById('titulo-operacion').textContent = (op.title || 'Operación').toUpperCase();
+            document.getElementById('ubicacion-operacion').textContent = op.location || 'Por definir';
+            document.getElementById('tipo-juego').textContent = op.type || 'Por definir';
+
+            const start = op.start_date ? new Date(op.start_date) : null;
+            const end = op.end_date ? new Date(op.end_date) : null;
+            if (start && !Number.isNaN(start.getTime())) {
+                document.getElementById('fecha-operacion').textContent = formatDateEs(start);
+                const startTime = formatTime(start);
+                const endTime = end && !Number.isNaN(end.getTime()) ? formatTime(end) : '';
+                document.getElementById('hora-operacion').textContent = endTime ? `${startTime} - ${endTime}` : startTime;
+            } else {
+                document.getElementById('fecha-operacion').textContent = 'Por definir';
+                document.getElementById('hora-operacion').textContent = 'Por definir';
+            }
+
+            document.getElementById('descripcion-operacion').textContent = op.lore || op.description || 'Sin descripción.';
+
+            const max = op.max_participants;
+            const count = op.participant_count || 0;
+            if (max) {
+                const disponibles = Math.max(max - count, 0);
+                document.getElementById('cupos-disponibles').textContent = disponibles;
+                document.getElementById('cupos-totales').textContent = max;
+                const porcentaje = Math.min(Math.round((count / max) * 100), 100);
+                document.getElementById('porcentaje-cupos').textContent = `${porcentaje}%`;
+                document.getElementById('barra-progreso').style.width = `${porcentaje}%`;
+            } else {
+                document.getElementById('cupos-disponibles').textContent = count;
+                document.getElementById('cupos-totales').textContent = '∞';
+                document.getElementById('porcentaje-cupos').textContent = '—';
+                document.getElementById('barra-progreso').style.width = '0%';
+            }
+
+            renderList(Array.isArray(op.requirements) ? op.requirements : [], 'requirements-list');
+            renderList(Array.isArray(op.rules) ? op.rules : [], 'rules-list');
+
+            // Cargar participantes de la operación
+            await cargarParticipantes(op.id);
         }
 
-        // DESINSCRIBIRSE
-        function desinscribirse() {
-            if (confirm('¿Estás seguro que deseas desinscribirte de esta operación?')) {
-                alert('✓ Te has desinscripto correctamente de la operación.');
-                localStorage.removeItem('inscripcion_' + getOperacionId());
-                mostrarEstadoInscripcion();
+        async function cargarParticipantes(operationId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/${encodeURIComponent(operationId)}/participants`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    document.getElementById('participantes-lista').innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #999;">No hay participantes registrados aún</p>';
+                    return;
+                }
+
+                const participantes = await response.json();
+
+                if (!Array.isArray(participantes) || participantes.length === 0) {
+                    document.getElementById('participantes-lista').innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #999;">No hay participantes registrados aún</p>';
+                    return;
+                }
+
+                // Renderizar cada participante
+                const listContainer = document.getElementById('participantes-lista');
+                listContainer.innerHTML = '';
+
+                participantes.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'participante-card';
+                    
+                    const avatar = p.user && p.user.photo 
+                        ? `<img src="${p.user.photo}" alt="${p.user_name}">`
+                        : `<i class="fas fa-user"></i>`;
+
+                    const statusLabel = p.status === 'attended' ? '✓ Asistió' : '📝 Registrado';
+
+                    card.innerHTML = `
+                        <div class="participante-avatar">
+                            ${avatar}
+                        </div>
+                        <div class="participante-name">${p.user_name || 'Usuario'}</div>
+                        <div class="participante-email">${p.user_email || ''}</div>
+                        <div class="participante-status">${statusLabel}</div>
+                        <button class="participante-qr-btn" onclick="abrirPerfilParticipante('${p.user_id}')">
+                            <i class="fas fa-user-circle"></i> Ver Perfil
+                        </button>
+                    `;
+
+                    listContainer.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error cargando participantes:', error);
+                document.getElementById('participantes-lista').innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #999;">Error al cargar participantes</p>';
             }
         }
 
-        // MOSTRAR ESTADO DE INSCRIPCIÓN
-        function mostrarEstadoInscripcion() {
+        function abrirPerfilParticipante(userId) {
+            window.location.href = `perfil-view.html?id=${userId}`;
+        }
+
+        function openAcceptModal() {
+            const modal = document.getElementById('acceptModal');
+            const err = document.getElementById('accept-error');
+            if (err) {
+                err.style.display = 'none';
+                err.textContent = '';
+            }
+            document.getElementById('accept-requirements').checked = false;
+            document.getElementById('accept-rules').checked = false;
+            modal.style.display = 'flex';
+        }
+
+        function closeAcceptModal() {
+            document.getElementById('acceptModal').style.display = 'none';
+        }
+
+        async function inscribirse() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Por favor, inicia sesión para inscribirte.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Verificar si ya está registrado
             const opId = getOperacionId();
-            const inscripto = localStorage.getItem('inscripcion_' + opId);
+            try {
+                const checkResponse = await fetch(`${API_BASE_URL}/operations/${encodeURIComponent(opId)}/is-registered`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (checkResponse.ok) {
+                    const checkData = await checkResponse.json();
+                    if (checkData.is_registered) {
+                        // Mostrar modal personalizado
+                        mostrarModalYaRegistrado();
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error verificando registro:', error);
+            }
+
+            openAcceptModal();
+        }
+
+        function mostrarModalYaRegistrado() {
+            // Crear modal personalizado
+            const modalHTML = `
+                <div id="yaRegistradoModal" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.7);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                ">
+                    <div style="
+                        background: white;
+                        padding: 2rem;
+                        border-radius: 12px;
+                        max-width: 400px;
+                        text-align: center;
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                    ">
+                        <div style="color: #f39c12; font-size: 4rem; margin-bottom: 1rem;">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <h2 style="color: #333; margin-bottom: 1rem;">Ya estás registrado</h2>
+                        <p style="color: #666; margin-bottom: 1.5rem;">
+                            Ya te encuentras inscrito en esta operación. No es necesario registrarse nuevamente.
+                        </p>
+                        <button onclick="cerrarModalYaRegistrado()" style="
+                            background: var(--accent);
+                            color: white;
+                            border: none;
+                            padding: 0.75rem 2rem;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 1rem;
+                            font-weight: bold;
+                        ">
+                            Entendido
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Agregar modal al body
+            const modalContainer = document.createElement('div');
+            modalContainer.innerHTML = modalHTML;
+            document.body.appendChild(modalContainer.firstElementChild);
+        }
+
+        function cerrarModalYaRegistrado() {
+            const modal = document.getElementById('yaRegistradoModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        async function confirmJoin() {
+            const opId = getOperacionId();
+            const token = localStorage.getItem('token');
+            const acceptRequirements = document.getElementById('accept-requirements').checked;
+            const acceptRules = document.getElementById('accept-rules').checked;
+            const err = document.getElementById('accept-error');
+
+            if (!acceptRequirements || !acceptRules) {
+                err.style.display = 'block';
+                err.textContent = 'Debes aceptar requisitos y reglas para continuar.';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/operations/${encodeURIComponent(opId)}/join`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        accept_requirements: true,
+                        accept_rules: true
+                    })
+                });
+
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    if (response.status === 409) {
+                        // Usuario ya registrado
+                        closeAcceptModal();
+                        mostrarModalYaRegistrado();
+                        await refreshRegistrationState();
+                        return;
+                    }
+                    const msg = data && data.error ? data.error : 'No se pudo completar la inscripción.';
+                    err.style.display = 'block';
+                    err.textContent = msg;
+                    return;
+                }
+
+                closeAcceptModal();
+                // Mostrar mensaje de éxito
+                alert('✅ Te has inscrito exitosamente en esta operación');
+                await refreshRegistrationState();
+                // Recargar participantes
+                await cargarParticipantes(getOperacionId());
+            } catch (e) {
+                err.style.display = 'block';
+                err.textContent = 'Error de red al inscribirse.';
+            }
+        }
+
+        // DESINSCRIBIRSE
+        async function desinscribirse() {
+            const opId = getOperacionId();
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('No hay sesión activa.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            if (!confirm('¿Estás seguro que deseas desinscribirte de esta operación?')) return;
+
+            const response = await fetch(`${API_BASE_URL}/operations/${encodeURIComponent(opId)}/leave`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                alert('No se pudo desinscribir.');
+                return;
+            }
+
+            await refreshRegistrationState();
+        }
+
+        async function refreshRegistrationState() {
+            const opId = getOperacionId();
+            const token = localStorage.getItem('token');
             const btnInscribir = document.getElementById('btn-inscribir');
             const btnDesinscribir = document.getElementById('btn-desinscribir');
             const estadoDiv = document.getElementById('estado-inscripcion');
 
-            if (inscripto) {
+            if (!token) {
+                btnInscribir.style.display = 'block';
+                btnDesinscribir.style.display = 'none';
+                estadoDiv.classList.remove('activo');
+                return;
+            }
+
+            const response = await fetch(`${API_BASE_URL}/operations/${encodeURIComponent(opId)}/is-registered`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                btnInscribir.style.display = 'block';
+                btnDesinscribir.style.display = 'none';
+                estadoDiv.classList.remove('activo');
+                return;
+            }
+
+            const data = await response.json().catch(() => ({ registered: false }));
+            if (data && data.registered) {
                 btnInscribir.style.display = 'none';
                 btnDesinscribir.style.display = 'block';
                 estadoDiv.classList.add('activo');
@@ -522,8 +892,7 @@
         // INICIALIZAR
         document.addEventListener('DOMContentLoaded', function() {
             checkSession();
-            cargarOperacion();
-            mostrarEstadoInscripcion();
+            cargarOperacion().then(refreshRegistrationState).catch(() => {});
         });
     </script>
 </body>

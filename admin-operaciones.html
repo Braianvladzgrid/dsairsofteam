@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Admin - Operaciones - Death Squad Airsoft</title>
+    <title>Panel Admin - Operaciones - Death Squad Airsoft Team</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -389,6 +389,33 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="op-lore">Historia / Lore</label>
+                    <textarea id="op-lore" placeholder="Historia de la operación, contexto, misión, etc."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Requisitos y Equipamiento</label>
+                    <div style="display:flex; gap:0.5rem;">
+                        <input type="text" id="req-input" placeholder="Ej: Protección ocular obligatoria">
+                        <button type="button" class="btn btn-primary" style="padding:0.6rem 1rem;" onclick="addRequirement()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="req-list" style="margin-top:0.75rem;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Reglas de la Operación</label>
+                    <div style="display:flex; gap:0.5rem;">
+                        <input type="text" id="rule-input" placeholder="Ej: Prohibido disparar a menos de X metros">
+                        <button type="button" class="btn btn-primary" style="padding:0.6rem 1rem;" onclick="addRule()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="rule-list" style="margin-top:0.75rem;"></div>
+                </div>
+
+                <div class="form-group">
                     <label for="op-price">Precio ($) *</label>
                     <input type="number" id="op-price" required step="0.01" min="0">
                 </div>
@@ -442,6 +469,9 @@
         const API_BASE_URL = 'http://localhost:5000/api';
         let token = localStorage.getItem('token');
 
+        let requirements = [];
+        let rules = [];
+
         if (!token) window.location.href = 'index.html';
 
         async function checkAdmin() {
@@ -463,7 +493,7 @@
             const container = document.getElementById('operations-container');
             loading.classList.add('active');
             try {
-                const response = await fetch(`${API_BASE_URL}/operations`, {
+                const response = await fetch(`${API_BASE_URL}/operations/admin`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const operations = await response.json();
@@ -512,12 +542,61 @@
             `).join('');
         }
 
+        function renderChipList(items, containerId, removeFnName) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">Sin items</p>';
+                return;
+            }
+            container.innerHTML = items.map((t, idx) => `
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem; background: var(--darker); border: 1px solid var(--accent); border-radius: 6px; padding: 0.6rem 0.75rem; margin-bottom: 0.5rem;">
+                    <span style="color: var(--text); font-size: 0.95rem;">${t}</span>
+                    <button type="button" class="btn btn-danger" style="padding:0.35rem 0.6rem; font-size:0.85rem;" onclick="${removeFnName}(${idx})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function addRequirement() {
+            const input = document.getElementById('req-input');
+            const text = (input.value || '').trim();
+            if (!text) return;
+            requirements.push(text);
+            input.value = '';
+            renderChipList(requirements, 'req-list', 'removeRequirement');
+        }
+
+        function removeRequirement(idx) {
+            requirements.splice(idx, 1);
+            renderChipList(requirements, 'req-list', 'removeRequirement');
+        }
+
+        function addRule() {
+            const input = document.getElementById('rule-input');
+            const text = (input.value || '').trim();
+            if (!text) return;
+            rules.push(text);
+            input.value = '';
+            renderChipList(rules, 'rule-list', 'removeRule');
+        }
+
+        function removeRule(idx) {
+            rules.splice(idx, 1);
+            renderChipList(rules, 'rule-list', 'removeRule');
+        }
+
         function openNewOperationModal() {
             document.getElementById('operationId').value = '';
             document.getElementById('modal-title').textContent = 'Nueva Operación';
             document.getElementById('operationForm').reset();
             document.getElementById('modal-message').innerHTML = '';
             document.getElementById('image-preview').style.display = 'none';
+            requirements = [];
+            rules = [];
+            renderChipList(requirements, 'req-list', 'removeRequirement');
+            renderChipList(rules, 'rule-list', 'removeRule');
             document.getElementById('operationModal').classList.add('active');
         }
 
@@ -536,6 +615,7 @@
                 document.getElementById('op-title').value = op.title;
                 document.getElementById('op-type').value = op.type;
                 document.getElementById('op-description').value = op.description || '';
+                document.getElementById('op-lore').value = op.lore || '';
                 document.getElementById('op-price').value = op.price;
                 document.getElementById('op-location').value = op.location || '';
                 document.getElementById('op-start-date').value = new Date(op.start_date).toISOString().slice(0, 16);
@@ -543,6 +623,11 @@
                 document.getElementById('op-max-participants').value = op.max_participants || '';
                 document.getElementById('op-image').value = op.image || '';
                 document.getElementById('op-active').checked = op.is_active;
+
+                requirements = Array.isArray(op.requirements) ? op.requirements : [];
+                rules = Array.isArray(op.rules) ? op.rules : [];
+                renderChipList(requirements, 'req-list', 'removeRequirement');
+                renderChipList(rules, 'rule-list', 'removeRule');
                 if (op.image) {
                     document.getElementById('image-preview').innerHTML = `<img src="${op.image}" alt="preview" onerror="this.parentElement.style.display='none'">`;
                     document.getElementById('image-preview').style.display = 'flex';
@@ -560,6 +645,9 @@
                 title: document.getElementById('op-title').value,
                 type: document.getElementById('op-type').value,
                 description: document.getElementById('op-description').value,
+                lore: document.getElementById('op-lore').value,
+                requirements,
+                rules,
                 price: parseFloat(document.getElementById('op-price').value),
                 location: document.getElementById('op-location').value,
                 start_date: new Date(document.getElementById('op-start-date').value).toISOString(),
@@ -570,7 +658,7 @@
             };
             const messageDiv = document.getElementById('modal-message');
             try {
-                const response = await fetch(id ? `${API_BASE_URL}/operations/${id}` : `${API_BASE_URL}/operations`, {
+                const response = await fetch(id ? `${API_BASE_URL}/operations/${id}` : `${API_BASE_URL}/operations/`, {
                     method: id ? 'PUT' : 'POST',
                     headers: {
                         'Content-Type': 'application/json',
