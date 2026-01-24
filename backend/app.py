@@ -7,6 +7,12 @@ from routes.properties import properties_bp
 from routes.users import users_bp
 from routes.operations import operations_bp
 import os
+from typing import Optional
+
+def _parse_cors_origins(value: Optional[str]) -> list[str]:
+    if not value:
+        return []
+    return [origin.strip() for origin in value.split(',') if origin.strip()]
 
 def create_app(config_name=None):
     if config_name is None:
@@ -19,10 +25,26 @@ def create_app(config_name=None):
     db.init_app(app)
     
     # Configurar CORS correctamente para todas las rutas - Permitir requests del frontend
+    default_origins = [
+        # Local dev
+        "http://localhost:8080",
+        "http://localhost:8000",
+        "http://localhost:5000",
+        "http://127.0.0.1:8080",
+        "http://127.0.0.1:8000",
+        "http://127.0.0.1:5000",
+        "http://0.0.0.0:8000",
+        "http://0.0.0.0:5000",
+        # Producción (frontends)
+        "https://dsairsofteam.onrender.com",
+        "https://dsairsofteam.vercel.app",
+    ]
+
+    env_origins = _parse_cors_origins(os.getenv('CORS_ORIGINS'))
+    cors_origins = env_origins if env_origins else default_origins
+
     CORS(app, 
-         origins=["http://localhost:8080", "http://localhost:8000", "http://localhost:5000", 
-                  "http://127.0.0.1:8080", "http://127.0.0.1:8000", "http://127.0.0.1:5000",
-                  "http://0.0.0.0:8000", "http://0.0.0.0:5000"],
+         origins=cors_origins,
          methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
          allow_headers=["Content-Type", "Authorization", "Accept"],
          supports_credentials=True,

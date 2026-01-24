@@ -62,7 +62,7 @@ python init_db.py
 python app.py
 ```
 
-El servidor estará disponible en `http://localhost:5000`
+El servidor estará disponible en `https://dsairsofteam-backend.onrender.com`
 
 ### Usuario Admin Predeterminado
 
@@ -148,7 +148,7 @@ Todos los inputs se validan automáticamente:
 
 ```bash
 # Registrarse
-curl -X POST http://localhost:5000/api/auth/register \
+curl -X POST https://dsairsofteam-backend.onrender.com/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Juan Pérez",
@@ -158,7 +158,7 @@ curl -X POST http://localhost:5000/api/auth/register \
   }'
 
 # Iniciar sesión
-curl -X POST http://localhost:5000/api/auth/login \
+curl -X POST https://dsairsofteam-backend.onrender.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "juan@example.com",
@@ -166,7 +166,7 @@ curl -X POST http://localhost:5000/api/auth/login \
   }'
 
 # Crear propiedad (requiere token)
-curl -X POST http://localhost:5000/api/properties \
+curl -X POST https://dsairsofteam-backend.onrender.com/api/properties \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token_aqui>" \
   -d '{
@@ -192,6 +192,7 @@ python app.py
 Ver `.env.example` para todas las variables disponibles:
 
 - `PORT` - Puerto del servidor (default: 5000)
-- `DATABASE_URL` - URL de conexión a PostgreSQL
+- `DATABASE_URL` - URL de conexión a PostgreSQL (si tu proveedor usa `postgres://`, el backend lo normaliza a `postgresql://`)
+- `CORS_ORIGINS` - Lista separada por comas de orígenes permitidos (override del default)
 - `JWT_SECRET` - Secreto para firmar tokens JWT
 - `JWT_EXPIRE` - Tiempo de expiración de tokens (en segundos)

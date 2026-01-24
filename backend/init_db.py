@@ -11,6 +11,11 @@ from werkzeug.security import generate_password_hash
 def _ensure_operation_columns():
     """Migración liviana para SQLite sin Alembic."""
     try:
+        # Solo aplica a SQLite (usa PRAGMA y ALTER TABLE específicos)
+        dialect = db.engine.dialect.name if db.engine else None
+        if dialect != 'sqlite':
+            return
+
         result = db.session.execute(db.text("PRAGMA table_info(operations)"))
         existing_cols = {row[1] for row in result.fetchall()}
 
