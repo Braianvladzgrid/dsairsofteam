@@ -1,168 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Death Squad Airsoft Team - Plataforma de Eventos</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Ajuste para header responsivo */
-        @media (max-width: 768px) {
-            main {
-                margin-top: 60px;
-            }
-        }
+    <link rel="stylesheet" href="style.css">
+</head>
 
-        /* Dropdown fijo al pasar el mouse */
-        .dropdown {
-            position: relative;
-        }
-
-        .dropdown:hover .dropdown-menu {
-            display: block;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: var(--dark);
-            border: 2px solid var(--accent);
-            border-radius: 0 0 8px 8px;
-            min-width: 200px;
-            z-index: 1000;
-            padding: 0.5rem 0;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-        }
-
-        .dropdown-menu {
-            display: none;
-        }
-
-        .dropdown-menu a {
-            display: block;
-            padding: 0.75rem 1.5rem;
-            color: var(--text);
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .dropdown-menu a:hover {
-            background: var(--accent);
-            color: var(--dark);
-            padding-left: 2rem;
-        }
-
-        /* Welcome popup (post-login) */
-        .welcome-modal {
-            background: rgba(0, 0, 0, 0.35);
-            backdrop-filter: blur(2px);
-        }
-
-        .welcome-card {
-            width: 300px;
-            max-width: 92vw;
-            background: #f7f7f8;
-            color: #1f2937;
-            border: 1px solid #d0d5dd;
-            border-radius: 16px;
-            box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
-            padding: 0.85rem;
-            text-align: left;
-        }
-
-        .welcome-top {
-            display: grid;
-            grid-template-columns: 40px 1fr 32px;
-            gap: 0.75rem;
-            align-items: start;
-            margin-bottom: 0.85rem;
-        }
-
-        .welcome-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: rgba(255, 107, 53, 0.12);
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-        }
-
-        .welcome-title {
-            margin: 0;
-            font-size: 1rem;
-            font-weight: 800;
-            line-height: 1.2;
-        }
-
-        .welcome-subtitle {
-            margin-top: 0.25rem;
-            font-size: 0.85rem;
-            color: #667085;
-        }
-
-        .welcome-close {
-            appearance: none;
-            border: none;
-            background: transparent;
-            color: #667085;
-            cursor: pointer;
-            font-size: 1.25rem;
-            line-height: 1;
-            padding: 0.25rem;
-            border-radius: 10px;
-        }
-
-        .welcome-close:hover {
-            background: rgba(16, 24, 40, 0.06);
-            color: #101828;
-        }
-
-        .welcome-actions {
-            display: flex;
-            gap: 0.6rem;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-        }
-
-        .welcome-btn {
-            border-radius: 10px;
-            padding: 0.5rem 0.8rem;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        .welcome-btn-secondary {
-            background: #ffffff;
-            color: #1f2937;
-            border: 1px solid #d0d5dd;
-        }
-
-        .welcome-btn-secondary:hover {
-            background: #f9fafb;
-            transform: translateY(-1px);
-        }
-
-        .welcome-btn-primary {
-            background: var(--accent);
-            color: #ffffff;
-            border: 1px solid var(--accent);
-        }
-
-        .welcome-btn-primary:hover {
-            background: #ff5a1f;
-            transform: translateY(-1px);
-        }
-    </style>
 <body>
     <!-- HEADER FIJO -->
     <header>
         <div class="logo">
-                        <img class="logo-icon" src="https://drive.google.com/uc?export=view&id=1RElY2JP2l4sF6bh9v0U-engQ2LGtU3Ea" alt="Death Squad Airsoft Team">
-              <a href="index.html" class="logo-text">Death Squad Airsoft Team</a>
+            <img class="logo-icon" src="https://drive.google.com/uc?export=view&id=1RElY2JP2l4sF6bh9v0U-engQ2LGtU3Ea"
+                alt="Death Squad Airsoft Team">
+            <a href="index.html" class="logo-text">Death Squad Airsoft Team</a>
         </div>
-        <button id="menu-toggle" class="menu-toggle" style="display: none;">
+        <button id="menu-toggle" class="menu-toggle">
             <i class="fas fa-bars"></i>
         </button>
         <nav id="navbar">
@@ -193,7 +49,8 @@
                 <a href="registro.html" class="btn btn-primary">
                     <i class="fas fa-user-plus"></i> Registrarse
                 </a>
-                <button class="btn btn-secondary" onclick="document.getElementById('operaciones-activas').scrollIntoView({behavior: 'smooth'})">
+                <button class="btn btn-secondary"
+                    onclick="document.getElementById('operaciones-activas').scrollIntoView({behavior: 'smooth'})">
                     <i class="fas fa-binoculars"></i> Ver Operaciones
                 </button>
             </div>
@@ -202,7 +59,7 @@
         <!-- SECCIÓN DE OPERACIONES ACTIVAS -->
         <section id="operaciones-activas" class="container">
             <h2><i class="fas fa-calendar-alt"></i> Operaciones Activas</h2>
-            <div id="active-operations-loading" style="text-align: center; padding: 2rem;">
+            <div id="active-operations-loading" class="operations-loading">
                 <p><i class="fas fa-spinner fa-spin"></i> Cargando operaciones activas...</p>
             </div>
             <div class="operations-grid" id="active-operations-grid">
@@ -213,23 +70,23 @@
         <!-- SECCIÓN DE OPERACIONES PASADAS -->
         <section id="operaciones-pasadas" class="container">
             <h2><i class="fas fa-history"></i> Operaciones Pasadas</h2>
-            <div id="past-operations-loading" style="text-align: center; padding: 2rem;">
+            <div id="past-operations-loading" class="operations-loading">
                 <p><i class="fas fa-spinner fa-spin"></i> Cargando operaciones pasadas...</p>
             </div>
             <div class="operations-grid" id="past-operations-grid">
                 <!-- Se carga dinámicamente -->
             </div>
         </section>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        </div>
+        </div>
+        </div>
+        </div>
         </section>
 
         <!-- SECCIÓN MARKETPLACE - ALQUILERES -->
         <section id="alquileres" class="container">
             <h2><i class="fas fa-shopping-cart"></i> Alquileres de Réplicas Disponibles</h2>
-            <p style="text-align: center; color: var(--gray); margin-bottom: 2rem;">
+            <p class="section-lead">
                 Sección de alquileres próximamente. Por el momento, contacta al staff para más información.
             </p>
         </section>
@@ -237,7 +94,7 @@
         <!-- SECCIÓN COMPRA DE RÉPLICAS -->
         <section id="comprar" class="container">
             <h2><i class="fas fa-shopping-bag"></i> Comprar Réplica</h2>
-            <p style="text-align: center; margin-bottom: 2rem;">
+            <p class="section-lead section-lead-plain">
                 Sección de compra próximamente. Por el momento, contacta al staff para más información.
             </p>
         </section>
@@ -245,11 +102,11 @@
         <!-- SECCIÓN DE REGISTRO -->
         <section id="registro" class="container">
             <h2><i class="fas fa-user-plus"></i> Crear Cuenta</h2>
-            <p style="text-align: center; margin-bottom: 2rem; color: var(--gray);">
+            <p class="section-lead">
                 Regístrate para acceder a todas las operaciones y gestionar tu perfil.
             </p>
-            <p style="text-align: center;">
-                <a href="registro.html" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+            <p class="section-cta">
+                <a href="registro.html" class="btn btn-primary btn-cta">
                     <i class="fas fa-arrow-right"></i> Ir al Formulario de Registro
                 </a>
             </p>
@@ -258,11 +115,11 @@
         <!-- SECCIÓN DE PERFIL (Ejemplo) -->
         <section id="perfil" class="container">
             <h2><i class="fas fa-user-circle"></i> Mi Perfil</h2>
-            <p style="text-align: center; margin-bottom: 2rem; color: var(--gray);">
+            <p class="section-lead">
                 Accede a tu perfil para ver tu información personal, documento y código QR.
             </p>
-            <p style="text-align: center;">
-                <a href="perfil.html" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+            <p class="section-cta">
+                <a href="perfil.html" class="btn btn-primary btn-cta">
                     <i class="fas fa-arrow-right"></i> Ver Mi Perfil
                 </a>
             </p>
@@ -273,15 +130,16 @@
     <!-- FOOTER -->
     <footer>
         <p>&copy; 2026 Death Squad Airsoft Team. Todos los derechos reservados.</p>
-        <p style="font-size: 0.9rem; margin-top: 0.5rem;">
-            <a href="#" style="color: var(--accent); text-decoration: none;">Términos y Condiciones</a> | 
-            <a href="#" style="color: var(--accent); text-decoration: none;">Privacidad</a> | 
-            <a href="#" style="color: var(--accent); text-decoration: none;">Contacto</a>
+        <p class="footer-links">
+            <a href="#">Términos y Condiciones</a> |
+            <a href="#">Privacidad</a> |
+            <a href="#">Contacto</a>
         </p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const API_BASE_URL = 'http://localhost:5000/api';
+        const API_BASE_URL = 'https://dsairsofteam-backend.onrender.com/api';
 
         // MENÚ HAMBURGUESA RESPONSIVO
         const menuToggle = document.getElementById('menu-toggle');
@@ -289,7 +147,7 @@
         const authButtons = document.querySelector('.auth-buttons');
 
         if (menuToggle) {
-            menuToggle.addEventListener('click', function() {
+            menuToggle.addEventListener('click', function () {
                 navbar.classList.toggle('active');
             });
         }
@@ -304,14 +162,14 @@
                 if (authButtons) {
                     let adminLink = '';
                     if (user.is_admin) {
-                        adminLink = `<a href="http://localhost:8000/admin-panel.html" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+                        adminLink = `<a href="http://localhost:8000/admin-panel.html" class="btn btn-primary admin-dashboard-link">
                             <i class="fas fa-cog"></i> Dashboard
                         </a>`;
                     }
-                    
+
                     authButtons.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 1rem; color: var(--text);">
-                            <span><i class="fas fa-user"></i> ${user.name} ${user.is_admin ? '<span style="color: var(--accent); font-weight: bold;">[ADMIN]</span>' : ''}</span>
+                        <div class="auth-user-row">
+                            <span class="auth-user-name"><i class="fas fa-user"></i> ${user.name} ${user.is_admin ? '<span class="admin-badge">[ADMIN]</span>' : ''}</span>
                             ${adminLink}
                             <button onclick="logout()" class="btn btn-secondary">
                                 <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
@@ -348,14 +206,14 @@
                     credentials: 'include'
                 });
                 if (!response.ok) throw new Error('Error al cargar operaciones activas');
-                
+
                 const operations = await response.json();
                 displayOperations(operations, 'active-operations-grid');
                 document.getElementById('active-operations-loading').style.display = 'none';
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('active-operations-loading').innerHTML = 
-                    '<p style="color: var(--accent);">❌ Error al cargar operaciones activas</p>';
+                document.getElementById('active-operations-loading').innerHTML =
+                    '<p class="load-error">❌ Error al cargar operaciones activas</p>';
             }
         }
 
@@ -371,38 +229,38 @@
                     credentials: 'include'
                 });
                 if (!response.ok) throw new Error('Error al cargar operaciones pasadas');
-                
+
                 const operations = await response.json();
                 displayOperations(operations, 'past-operations-grid');
                 document.getElementById('past-operations-loading').style.display = 'none';
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('past-operations-loading').innerHTML = 
-                    '<p style="color: var(--accent);">❌ Error al cargar operaciones pasadas</p>';
+                document.getElementById('past-operations-loading').innerHTML =
+                    '<p class="load-error">❌ Error al cargar operaciones pasadas</p>';
             }
         }
 
         // Mostrar operaciones en tarjetas
         function displayOperations(operations, gridId) {
             const grid = document.getElementById(gridId);
-            
+
             if (operations.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--gray); padding: 2rem;">Sin operaciones</p>';
+                grid.innerHTML = '<p class="grid-empty-message">Sin operaciones</p>';
                 return;
             }
 
             grid.innerHTML = operations.map(op => `
                 <div class="event-card">
-                    ${op.image ? `<div class="event-card-image" style="background-image: url('${op.image}'); min-height: 200px; background-size: cover; background-position: center;"></div>` : ''}
+                    ${op.image ? `<div class="event-card-image" style="background-image: url('${op.image}');"></div>` : ''}
                     <div class="event-card-header">
                         <h3>${op.title || 'Operación Airsoft'}</h3>
-                        <p class="operation-type" style="color: var(--accent); font-weight: bold;">${op.type.toUpperCase()}</p>
+                        <p class="operation-type">${op.type.toUpperCase()}</p>
                     </div>
                     <div class="event-card-body">
-                        ${op.description ? `<p style="color: var(--gray); font-size: 0.95rem; margin-bottom: 1rem;">${op.description.substring(0, 100)}...</p>` : ''}
+                        ${op.description ? `<p class="operation-description">${op.description.substring(0, 100)}...</p>` : ''}
                         <div class="event-detail">
                             <i class="fas fa-calendar"></i>
-                            <span><strong>Fecha:</strong> ${new Date(op.start_date).toLocaleDateString('es-ES', {year: 'numeric', month: 'long', day: 'numeric'})}</span>
+                            <span><strong>Fecha:</strong> ${new Date(op.start_date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                         </div>
                         <div class="event-detail">
                             <i class="fas fa-dollar-sign"></i>
@@ -418,7 +276,7 @@
                         </div>
                     </div>
                     <div class="event-card-footer">
-                        <span class="cupos" style="background: ${op.is_active ? 'var(--accent)' : 'var(--gray)'}; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem;">
+                        <span class="cupos ${op.is_active ? 'cupos--active' : 'cupos--inactive'}">
                             ${op.is_active ? '✓ Disponible' : '✗ Cancelada'}
                         </span>
                         <button class="btn btn-primary btn-small" onclick="viewOperationDetail('${op.id}')">Ver Detalle</button>
@@ -440,59 +298,51 @@
         // Modal de iniciar sesión
         const loginModal = document.createElement('div');
         loginModal.id = 'loginModal';
-        loginModal.className = 'modal';
+        loginModal.className = 'modal login-modal';
         loginModal.innerHTML = `
-            <div class="modal-content" style="width: 380px; padding: 2rem; background: #f5f5f5; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
-                <button class="modal-close" onclick="closeLoginModal()" style="background: none; border: none; color: #333; font-size: 1.8rem; cursor: pointer; float: right; padding: 0; width: auto; line-height: 1;">&times;</button>
-                <div style="text-align: center; margin-bottom: 1.5rem; clear: both;">
-                    <h2 style="color: #333; margin: 0 0 0.5rem 0; font-size: 1.3rem;">Iniciar Sesión</h2>
-                    <p style="color: #666; font-size: 0.85rem; margin: 0;">Accede a tu cuenta</p>
+            <div class="modal-content login-modal-content" role="dialog" aria-modal="true" aria-label="Iniciar sesión">
+                <button class="modal-close login-modal-close" onclick="closeLoginModal()" type="button" aria-label="Cerrar">&times;</button>
+                <div class="login-modal-header">
+                    <h2 class="login-modal-title">Iniciar Sesión</h2>
+                    <p class="login-modal-subtitle">Accede a tu cuenta</p>
                 </div>
                 <form id="login-form" onsubmit="handleLogin(event)">
-                    <div class="form-group" style="margin-bottom: 1rem;">
-                        <label for="login-email" style="color: #333; font-weight: 500; display: block; margin-bottom: 0.4rem; font-size: 0.9rem;">Email</label>
-                        <input type="email" id="login-email" placeholder="tu@email.com" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; color: #333; font-size: 0.95rem; box-sizing: border-box;">
+                    <div class="form-group login-form-group">
+                        <label for="login-email" class="login-label">Email</label>
+                        <input type="email" id="login-email" placeholder="tu@email.com" required class="form-input login-input">
                     </div>
-                    <div class="form-group" style="margin-bottom: 1rem;">
-                        <label for="login-password" style="color: #333; font-weight: 500; display: block; margin-bottom: 0.4rem; font-size: 0.9rem;">Contraseña</label>
-                        <input type="password" id="login-password" placeholder="Tu contraseña" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; color: #333; font-size: 0.95rem; box-sizing: border-box;">
+                    <div class="form-group login-form-group">
+                        <label for="login-password" class="login-label">Contraseña</label>
+                        <input type="password" id="login-password" placeholder="Tu contraseña" required class="form-input login-input">
                     </div>
-                    <div id="login-error" style="color: #d32f2f; margin-bottom: 1rem; text-align: center; display: none; font-size: 0.85rem;"></div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 0.95rem; margin-bottom: 0.5rem; background: #2d5016; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    <div id="login-error" class="login-error" aria-live="polite"></div>
+                    <button type="submit" class="btn btn-primary login-submit">
                         Iniciar Sesión
                     </button>
                 </form>
-                <div style="text-align: center; font-size: 0.8rem; color: #666;">
-                    <p style="margin: 0.5rem 0;">¿No tienes cuenta? <a href="registro.html" style="color: #2d5016; text-decoration: none; font-weight: 500;">Registrarse</a></p>
+                <div class="login-footer">
+                    <p>¿No tienes cuenta? <a href="registro.html">Registrarse</a></p>
                 </div>
-                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd; font-size: 0.8rem;">
-                    <p style="color: #666; font-weight: bold; margin: 0 0 0.3rem 0;">Demo:</p>
-                    <p style="color: #666; margin: 0.2rem 0;"><strong>Admin:</strong> admin@dsairsofteam.local / Admin123!</p>
-                    <p style="color: #666; margin: 0.2rem 0;"><strong>Usuario:</strong> test@test.com / test123</p>
+                <div class="login-demo">
+                    <p class="login-demo-title">Demo:</p>
+                    <p><strong>Admin:</strong> admin@dsairsofteam.local / Admin123!</p>
+                    <p><strong>Usuario:</strong> test@test.com / test123</p>
                 </div>
             </div>
         `;
 
-        loginModal.style.display = 'none';
-        loginModal.style.position = 'fixed';
-        loginModal.style.top = '0';
-        loginModal.style.left = '0';
-        loginModal.style.width = '100%';
-        loginModal.style.height = '100%';
-        loginModal.style.background = 'rgba(0,0,0,0.5)';
-        loginModal.style.zIndex = '9000';
-        loginModal.style.alignItems = 'center';
-        loginModal.style.justifyContent = 'center';
         document.body.appendChild(loginModal);
 
         function openLoginModal() {
-            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('loginModal').classList.add('active');
         }
 
         function closeLoginModal() {
-            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('loginModal').classList.remove('active');
             document.getElementById('login-form').reset();
-            document.getElementById('login-error').style.display = 'none';
+            const err = document.getElementById('login-error');
+            err.textContent = '';
+            err.classList.remove('is-visible');
         }
 
         // Manejar login
@@ -504,7 +354,8 @@
             const errorDiv = document.getElementById('login-error');
             const submitBtn = e.target.querySelector('button[type="submit"]');
 
-            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+            errorDiv.classList.remove('is-visible');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando...';
 
@@ -534,36 +385,30 @@
                     showWelcomePopup(data.user);
                 } else {
                     errorDiv.textContent = `❌ ${data.error || 'Error de login'}`;
-                    errorDiv.style.display = 'block';
+                    errorDiv.classList.add('is-visible');
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión';
                 }
             } catch (error) {
                 console.error('Error:', error);
                 if (error.name === 'AbortError') {
-                    errorDiv.textContent = '❌ Tiempo agotado. Verifica que http://localhost:5000 esté corriendo.';
+                    errorDiv.textContent = '❌ Tiempo agotado. Verifica que https://dsairsofteam-backend.onrender.com esté disponible.';
                 } else {
-                    errorDiv.textContent = '❌ Error de conexión. Asegúrate que el backend está en http://localhost:5000';
+                    errorDiv.textContent = '❌ Error de conexión. Asegúrate que el backend está en https://dsairsofteam-backend.onrender.com';
                 }
-                errorDiv.style.display = 'block';
+                errorDiv.classList.add('is-visible');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión';
             }
         }
 
-        // Botón iniciar sesión
-        const loginBtn = document.querySelector('.auth-buttons .btn-secondary');
-        if (loginBtn) {
-            loginBtn.addEventListener('click', openLoginModal);
-        }
         function showWelcomePopup(user) {
             const welcomeModal = document.createElement('div');
             welcomeModal.className = 'modal active welcome-modal';
             welcomeModal.id = 'welcomeModal';
-            welcomeModal.style.zIndex = '9999';
 
             const isAdmin = user.is_admin || false;
-            
+
             welcomeModal.innerHTML = `
                 <div class="welcome-card" role="dialog" aria-modal="true" aria-label="Bienvenida">
                     <div class="welcome-top">
@@ -589,7 +434,7 @@
             document.body.appendChild(welcomeModal);
 
             // Cerrar al hacer click fuera
-            welcomeModal.addEventListener('click', function(e) {
+            welcomeModal.addEventListener('click', function (e) {
                 if (e.target === welcomeModal) {
                     welcomeModal.remove();
                 }
@@ -597,7 +442,7 @@
 
             // Cerrar automáticamente después de 3 segundos si no es admin
             if (!isAdmin) {
-                setTimeout(function() {
+                setTimeout(function () {
                     if (welcomeModal.parentElement) {
                         welcomeModal.remove();
                         window.location.href = 'perfil.html';
@@ -607,9 +452,9 @@
         }
 
         // DROPDOWN RESPONSIVO
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             const dropdown = e.target.closest('.dropdown');
-            
+
             if (dropdown) {
                 // En móvil, toggle el dropdown
                 if (window.innerWidth <= 768) {
@@ -624,7 +469,7 @@
         });
 
         // Cerrar menú al hacer resize
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
             if (window.innerWidth > 768) {
                 if (navbar) navbar.classList.remove('active');
                 document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
@@ -632,20 +477,17 @@
         });
 
         // Cerrar modal al hacer click fuera
-        window.addEventListener('click', function(e) {
+        window.addEventListener('click', function (e) {
             if (e.target === loginModal) {
                 loginModal.classList.remove('active');
             }
         });
 
         // Cargar todo al iniciar
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             checkSession();
             loadActiveOperations();
             loadPastOperations();
-            loadActiveOperations();
-            loadPastOperations();
-            checkSession();
 
             const params = new URLSearchParams(window.location.search);
             if (params.get('login') === '1') {
@@ -654,4 +496,5 @@
         });
     </script>
 </body>
+
 </html>
