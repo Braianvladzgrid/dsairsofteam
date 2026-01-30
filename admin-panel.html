@@ -69,6 +69,35 @@
             border-radius: 8px;
         }
 
+        .quick-access-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0 1.5rem 0;
+            border-radius: 8px;
+            border: 2px solid var(--accent);
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.08) 0%, rgba(45, 80, 22, 0.06) 100%);
+        }
+
+        .quick-access-card h3 {
+            margin: 0 0 0.25rem 0;
+            color: var(--dark-green);
+            font-size: 1.05rem;
+        }
+
+        .quick-access-card p {
+            margin: 0;
+            color: var(--gray);
+        }
+
+        .quick-access-url {
+            font-weight: 600;
+            color: var(--dark-green);
+            word-break: break-all;
+        }
+
         .admin-section {
             display: none;
             background: var(--white);
@@ -466,6 +495,21 @@
             <section id="dashboard" class="admin-section active">
                 <div class="section-header">
                     <h2><i class="fas fa-chart-pie"></i> Dashboard</h2>
+                </div>
+
+                <div class="quick-access-card" aria-label="Acceso rápido a panel de operaciones">
+                    <div>
+                        <h3><i class="fas fa-link"></i> Acceso rápido: Panel de Operaciones</h3>
+                        <p>
+                            URL:
+                            <a class="quick-access-url" id="operationsPanelUrl" href="admin-operaciones.html" target="_blank" rel="noopener">admin-operaciones.html</a>
+                        </p>
+                    </div>
+                    <div>
+                        <a class="btn btn-primary" id="operationsPanelBtn" href="admin-operaciones.html" target="_blank" rel="noopener">
+                            <i class="fas fa-external-link-alt"></i> Abrir Panel
+                        </a>
+                    </div>
                 </div>
 
                 <div class="stats-grid">
@@ -1272,7 +1316,22 @@
             const ok = await requireAdminSession();
             if (!ok) return;
             checkSession();
+            setupOperationsPanelLink();
             loadDashboard();
+        }
+
+        function setupOperationsPanelLink() {
+            const urlEl = document.getElementById('operationsPanelUrl');
+            const btnEl = document.getElementById('operationsPanelBtn');
+
+            if (!urlEl || !btnEl) return;
+
+            const targetPath = 'admin-operaciones.html';
+            const absoluteUrl = `${window.location.origin}/${targetPath}`;
+
+            urlEl.textContent = absoluteUrl;
+            urlEl.href = targetPath;
+            btnEl.href = targetPath;
         }
 
 

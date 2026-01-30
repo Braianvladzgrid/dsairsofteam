@@ -12,7 +12,7 @@ API_BASE = 'http://localhost:5000/api'
 def login(email: str, password: str, label: str = ""):
     """Login y obtención de token"""
     prefix = f" ({label})" if label else ""
-    print(f"🔐 Probando login{prefix}...")
+    print(f"[login] Probando login{prefix}...")
     response = requests.post(
         f'{API_BASE}/auth/login',
         json={'email': email, 'password': password},
@@ -21,7 +21,7 @@ def login(email: str, password: str, label: str = ""):
 
     if response.status_code == 200:
         data = response.json()
-        print(f"✅ Login exitoso: {data['user']['email']}")
+        print(f"[ok] Login exitoso: {data['user']['email']}")
         return data['token'], data['user']
 
     print(f"❌ Error en login: {response.status_code} {response.text}")
@@ -33,7 +33,7 @@ def ensure_test_user(email: str, password: str):
     if token:
         return token, user
 
-    print("🧾 Intentando registrar usuario de prueba...")
+    print("[register] Intentando registrar usuario de prueba...")
     response = requests.post(
         f'{API_BASE}/auth/register',
         json={
@@ -48,12 +48,12 @@ def ensure_test_user(email: str, password: str):
 
     if response.status_code in (200, 201):
         data = response.json()
-        print(f"✅ Usuario registrado: {data['user']['email']}")
+        print(f"[ok] Usuario registrado: {data['user']['email']}")
         return data['token'], data['user']
 
     # Si ya existe, reintentar login
     if response.status_code == 409:
-        print("ℹ️  Usuario ya existía. Reintentando login...")
+        print("[info] Usuario ya existía. Reintentando login...")
         return login(email, password, label="usuario")
 
     print(f"❌ No se pudo registrar usuario: {response.status_code} {response.text}")
@@ -61,7 +61,7 @@ def ensure_test_user(email: str, password: str):
 
 def test_create_operation(token):
     """Crear operación de prueba"""
-    print("\n📅 Creando operación de ejemplo...")
+    print("\n[operation] Creando operación de ejemplo...")
     
     start_date = datetime.now() + timedelta(days=7)
     end_date = start_date + timedelta(hours=6)
@@ -97,7 +97,7 @@ def test_create_operation(token):
     )
     
     if response.status_code == 201:
-        print("✅ Operación creada exitosamente")
+        print("[ok] Operación creada exitosamente")
         return response.json()
     else:
         print(f"❌ Error creando operación: {response.status_code}")
@@ -106,12 +106,12 @@ def test_create_operation(token):
 
 def test_get_operations():
     """Obtener todas las operaciones"""
-    print("\n📋 Obteniendo operaciones...")
+    print("\n[operations] Obteniendo operaciones...")
     response = requests.get(f'{API_BASE}/operations')
     
     if response.status_code == 200:
         ops = response.json()
-        print(f"✅ Operaciones encontradas: {len(ops)}")
+        print(f"[ok] Operaciones encontradas: {len(ops)}")
         for op in ops:
             print(f"   - {op['title']} ({op['type']}) - ${op['price']}")
         return ops
@@ -122,7 +122,7 @@ def test_get_operations():
 
 def test_registration_flow(operation_id: str, user_token: str):
     """Probar is-registered / join / join idempotente / leave"""
-    print("\n🧩 Probando inscripción a operación...")
+    print("\n[registration] Probando inscripción a operación...")
 
     headers = {'Authorization': f'Bearer {user_token}', 'Accept': 'application/json'}
 
@@ -136,7 +136,7 @@ def test_registration_flow(operation_id: str, user_token: str):
     join_body = {'accept_requirements': True, 'accept_rules': True}
     r1 = requests.post(f'{API_BASE}/operations/{operation_id}/join', headers=headers, json=join_body, timeout=10)
     if r1.status_code in (200, 201):
-        print(f"✅ Join OK (status {r1.status_code})")
+        print(f"[ok] Join OK (status {r1.status_code})")
     else:
         print(f"❌ Error join: {r1.status_code} {r1.text}")
         return
@@ -144,7 +144,7 @@ def test_registration_flow(operation_id: str, user_token: str):
     # Join idempotente
     r2 = requests.post(f'{API_BASE}/operations/{operation_id}/join', headers=headers, json=join_body, timeout=10)
     if r2.status_code in (200, 201):
-        print(f"✅ Join idempotente OK (status {r2.status_code})")
+        print(f"[ok] Join idempotente OK (status {r2.status_code})")
     else:
         print(f"❌ Error join idempotente: {r2.status_code} {r2.text}")
 
@@ -156,7 +156,7 @@ def test_registration_flow(operation_id: str, user_token: str):
 
     r4 = requests.post(f'{API_BASE}/operations/{operation_id}/leave', headers=headers, timeout=10)
     if r4.status_code in (200, 204):
-        print("✅ Leave OK")
+        print("[ok] Leave OK")
     else:
         print(f"❌ Error leave: {r4.status_code} {r4.text}")
 
@@ -168,11 +168,11 @@ def test_registration_flow(operation_id: str, user_token: str):
 
 def test_health():
     """Verificar salud del backend"""
-    print("🏥 Verificando salud del backend...")
+    print("[health] Verificando salud del backend...")
     try:
         response = requests.get(f'{API_BASE}/health', timeout=5)
         if response.status_code == 200:
-            print("✅ Backend está funcionando correctamente")
+            print("[ok] Backend está funcionando correctamente")
             return True
         else:
             print(f"❌ Backend respondió con código: {response.status_code}")
@@ -183,7 +183,7 @@ def test_health():
 
 def main():
     print("=" * 50)
-    print("🧪 TEST DEL SISTEMA DEATH SQUAD AIRSOFT")
+    print("TEST DEL SISTEMA DEATH SQUAD AIRSOFT")
     print("=" * 50)
     print()
     
@@ -212,10 +212,10 @@ def main():
     
     print()
     print("=" * 50)
-    print("✅ PRUEBAS COMPLETADAS")
+    print("PRUEBAS COMPLETADAS")
     print("=" * 50)
     print()
-    print("🌐 Ahora puedes abrir:")
+    print("Ahora puedes abrir:")
     print("   Frontend: http://localhost:8000")
     print("   Admin:    http://localhost:8000/admin-operaciones.html")
     print()

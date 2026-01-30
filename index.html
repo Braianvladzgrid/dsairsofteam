@@ -139,7 +139,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const API_BASE_URL = 'https://dsairsofteam-backend.onrender.com/api';
+        const PROD_API_BASE_URL = 'https://dsairsofteam-backend.onrender.com/api';
+        const LOCAL_API_BASE_URL = 'http://localhost:5000/api';
+
+        const API_BASE_URL = (() => {
+            const host = window.location.hostname;
+            const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0';
+            return isLocal ? LOCAL_API_BASE_URL : PROD_API_BASE_URL;
+        })();
+
+        const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, '');
 
         // MENÚ HAMBURGUESA RESPONSIVO
         const menuToggle = document.getElementById('menu-toggle');
@@ -162,7 +171,7 @@
                 if (authButtons) {
                     let adminLink = '';
                     if (user.is_admin) {
-                        adminLink = `<a href="http://localhost:8000/admin-panel.html" class="btn btn-primary admin-dashboard-link">
+                        adminLink = `<a href="admin-panel.html" class="btn btn-primary admin-dashboard-link">
                             <i class="fas fa-cog"></i> Dashboard
                         </a>`;
                     }
@@ -392,9 +401,9 @@
             } catch (error) {
                 console.error('Error:', error);
                 if (error.name === 'AbortError') {
-                    errorDiv.textContent = '❌ Tiempo agotado. Verifica que https://dsairsofteam-backend.onrender.com esté disponible.';
+                    errorDiv.textContent = `❌ Tiempo agotado. Verifica que ${BACKEND_ORIGIN} esté disponible.`;
                 } else {
-                    errorDiv.textContent = '❌ Error de conexión. Asegúrate que el backend está en https://dsairsofteam-backend.onrender.com';
+                    errorDiv.textContent = `❌ Error de conexión. Asegúrate que el backend está en ${BACKEND_ORIGIN}`;
                 }
                 errorDiv.classList.add('is-visible');
                 submitBtn.disabled = false;
@@ -421,7 +430,7 @@
                     </div>
 
                     <div class="welcome-actions">
-                        ${isAdmin ? `<button class="btn welcome-btn welcome-btn-primary" onclick="window.location.href='http://localhost:8000/admin-panel.html'">
+                        ${isAdmin ? `<button class="btn welcome-btn welcome-btn-primary" onclick="window.location.href='admin-panel.html'">
                             <i class="fas fa-gauge-high"></i> Ir al dashboard
                         </button>` : ''}
                         <button class="btn welcome-btn welcome-btn-secondary" onclick="document.getElementById('welcomeModal').remove()">

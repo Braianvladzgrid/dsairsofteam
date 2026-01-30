@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+backend/.venv/
+
+# Env files
+.env
+backend/.env
+
+# Local runtime logs
+*.log
+backend_run*.log
+frontend_run*.log
+
+# Local databases / instances (generated during dev)
+*.db
+backend/instance/*.db
+instance/*.db

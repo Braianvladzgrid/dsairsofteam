@@ -98,7 +98,7 @@ def create_app(config_name=None):
 if __name__ == '__main__':
     app = create_app()
     port = int(os.getenv('PORT', 5000))
-    print(f'✅ Server running on http://localhost:{port}')
+    print(f'Server running on http://localhost:{port}')
     # Debug solo si se habilita explícitamente
     debug = os.getenv('FLASK_DEBUG', '').lower() in ('1', 'true', 'yes')
     app.run(host='0.0.0.0', port=port, debug=debug)
