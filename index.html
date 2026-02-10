@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <script src="config.js"></script>
 </head>
 
 <body>
@@ -139,16 +140,24 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const PROD_API_BASE_URL = 'https://dsairsofteam-backend.onrender.com/api';
-        const LOCAL_API_BASE_URL = 'http://localhost:5000/api';
+        function getApiBaseUrl() {
+            if (typeof API_URL === 'string' && API_URL) {
+                return `${API_URL.replace(/\/$/, '')}/api`;
+            }
 
-        const API_BASE_URL = (() => {
-            const host = window.location.hostname;
-            const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0';
-            return isLocal ? LOCAL_API_BASE_URL : PROD_API_BASE_URL;
-        })();
+            const { protocol, hostname, port, origin } = window.location;
 
-        const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, '');
+            // Local split mode: frontend :8000, backend :5000
+            if (protocol === 'http:' && port === '8000') {
+                return `${protocol}//${hostname}:5000/api`;
+            }
+
+            // Proxy/tunnel mode
+            return `${origin}/api`;
+        }
+
+        const API_BASE_URL = getApiBaseUrl();
+        const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api$/, '');
 
         // MENÚ HAMBURGUESA RESPONSIVO
         const menuToggle = document.getElementById('menu-toggle');

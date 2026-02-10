@@ -35,6 +35,7 @@
             overflow-x: auto;
         }
     </style>
+    <script src="config.js"></script>
 </head>
 <body>
     <h1>🧪 Test de Conexión al Backend</h1>
@@ -63,7 +64,19 @@
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:5000/api';
+        function getApiBaseUrl() {
+            if (typeof API_URL === 'string' && API_URL) {
+                return `${API_URL.replace(/\/$/, '')}/api`;
+            }
+
+            const { protocol, hostname, port, origin } = window.location;
+            if (protocol === 'http:' && port === '8000') {
+                return `${protocol}//${hostname}:5000/api`;
+            }
+            return `${origin}/api`;
+        }
+
+        const API_BASE = getApiBaseUrl();
 
         function updateStatus() {
             const status = `
@@ -114,7 +127,7 @@ Timestamp: ${new Date().toISOString()}
                 const data = await response.json();
                 resultDiv.textContent = `Status: ${response.status}\n${JSON.stringify(data, null, 2)}`;
             } catch (error) {
-                resultDiv.textContent = `❌ Error: ${error.message}\n\nVerifica que:\n1. El backend está en http://localhost:5000\n2. El servidor está respondiendo\n3. No hay problemas de CORS`;
+                resultDiv.textContent = `❌ Error: ${error.message}\n\nVerifica que:\n1. La API responde en: ${API_BASE}\n2. El servidor está respondiendo\n3. No hay bloqueo de red (VPN/Firewall)`;
             }
         }
 

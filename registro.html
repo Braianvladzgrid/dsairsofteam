@@ -6,6 +6,7 @@
     <title>Registro - Death Squad Airsoft Team</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="config.js"></script>
 </head>
 <body>
     <!-- HEADER FIJO -->
@@ -143,7 +144,19 @@
     </footer>
 
     <script>
-        const API_BASE_URL = 'http://localhost:5000/api';
+        function getApiBaseUrl() {
+            if (typeof API_URL === 'string' && API_URL) {
+                return `${API_URL.replace(/\/$/, '')}/api`;
+            }
+
+            const { protocol, hostname, port, origin } = window.location;
+            if (protocol === 'http:' && port === '8000') {
+                return `${protocol}//${hostname}:5000/api`;
+            }
+            return `${origin}/api`;
+        }
+
+        const API_BASE_URL = getApiBaseUrl();
 
         // Actualizar header con información de usuario
         function checkSession() {
@@ -249,7 +262,7 @@
                         }
                     } catch (error) {
                         console.error('Error:', error);
-                        alert('❌ Error de conexión. Asegúrate que el backend está corriendo en http://localhost:5000');
+                        alert(`❌ Error de conexión. Verifica que la API esté disponible en: ${API_BASE_URL}`);
                     }
                 });
             }

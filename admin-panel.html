@@ -6,6 +6,7 @@
     <title>Panel Admin - Death Squad Airsoft Team</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="config.js"></script>
     <style>
         :root {
             --admin-footer-height: 64px;
@@ -920,7 +921,23 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:5000/api';
+        function getApiBaseUrl() {
+            if (typeof API_URL === 'string' && API_URL) {
+                return `${API_URL.replace(/\/$/, '')}/api`;
+            }
+
+            const { protocol, hostname, port, origin } = window.location;
+
+            // Si estás en local con `start_all.sh` (frontend :8000, backend :5000)
+            if (protocol === 'http:' && port === '8000') {
+                return `${protocol}//${hostname}:5000/api`;
+            }
+
+            // Si estás usando proxy/túnel (Cloudflare/LocalTunnel/ngrok simple)
+            return `${origin}/api`;
+        }
+
+        const API_BASE_URL = getApiBaseUrl();
         function safeJsonParse(value, fallback = null) {
             try {
                 if (value === null || value === undefined || value === '') return fallback;

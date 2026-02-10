@@ -6,6 +6,7 @@
     <title>Perfil - Death Squad Airsoft Team</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
         .qr-section {
@@ -190,7 +191,19 @@
             }
         });
 
-        const API_BASE_URL = 'http://localhost:5000/api';
+        function getApiBaseUrl() {
+            if (typeof API_URL === 'string' && API_URL) {
+                return `${API_URL.replace(/\/$/, '')}/api`;
+            }
+
+            const { protocol, hostname, port, origin } = window.location;
+            if (protocol === 'http:' && port === '8000') {
+                return `${protocol}//${hostname}:5000/api`;
+            }
+            return `${origin}/api`;
+        }
+
+        const API_BASE_URL = getApiBaseUrl();
         let isEditing = false;
         let currentUser = null;
 
@@ -245,7 +258,7 @@
                 }
             } catch (error) {
                 console.error('Error de conexión:', error);
-                alert(`Error de conexión con el servidor. Asegúrate de que el backend esté corriendo en http://localhost:5000\n\nError: ${error.message}`);
+                alert(`Error de conexión con el servidor. Verifica que la API esté disponible en: ${API_BASE_URL}\n\nError: ${error.message}`);
                 window.location.href = 'index.html';
             }
         }

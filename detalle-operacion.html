@@ -6,6 +6,7 @@
     <title>Detalle Operación - Death Squad Airsoft Team</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="config.js"></script>
     <style>
         .detalle-header {
             background: linear-gradient(135deg, var(--dark-green) 0%, var(--green) 100%);
@@ -460,8 +461,21 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:5000/api';
+        function getApiBaseUrl() {
+            if (typeof API_URL === 'string' && API_URL) {
+                return `${API_URL.replace(/\/$/, '')}/api`;
+            }
+
+            const { protocol, hostname, port, origin } = window.location;
+            if (protocol === 'http:' && port === '8000') {
+                return `${protocol}//${hostname}:5000/api`;
+            }
+            return `${origin}/api`;
+        }
+
+        const API_BASE_URL = getApiBaseUrl();
         let currentOperation = null;
+        let registrationClosed = false;
 
         // Actualizar header con información de usuario
         function checkSession() {
@@ -472,7 +486,7 @@
             if (token && user.id) {
                 let adminLink = '';
                 if (user.is_admin) {
-                    adminLink = `<a href="http://localhost:8000/admin-panel.html" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+                    adminLink = `<a href="admin-panel.html" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-cog"></i> Dashboard
                     </a>`;
                 }
@@ -568,6 +582,8 @@
             const op = await response.json();
             currentOperation = op;
 
+            registrationClosed = isRegistrationClosed(op);
+
             document.getElementById('cod-operacion').textContent = op.id;
             document.getElementById('titulo-operacion').textContent = (op.title || 'Operación').toUpperCase();
             document.getElementById('ubicacion-operacion').textContent = op.location || 'Por definir';
@@ -608,6 +624,37 @@
 
             // Cargar participantes de la operación
             await cargarParticipantes(op.id);
+
+            // Aplicar estado de inscripción según fecha
+            applyRegistrationUiState();
+        }
+
+        function isRegistrationClosed(op) {
+            try {
+                if (!op || !op.start_date) return false;
+                const start = new Date(op.start_date);
+                if (Number.isNaN(start.getTime())) return false;
+                return start.getTime() < Date.now();
+            } catch {
+                return false;
+            }
+        }
+
+        function applyRegistrationUiState() {
+            const btnInscribir = document.getElementById('btn-inscribir');
+            if (!btnInscribir) return;
+
+            if (registrationClosed) {
+                btnInscribir.disabled = true;
+                btnInscribir.style.opacity = '0.75';
+                btnInscribir.style.cursor = 'not-allowed';
+                btnInscribir.innerHTML = '<i class="fas fa-lock"></i> Inscripción cerrada (fecha pasada)';
+            } else {
+                btnInscribir.disabled = false;
+                btnInscribir.style.opacity = '';
+                btnInscribir.style.cursor = '';
+                btnInscribir.innerHTML = '<i class="fas fa-check-circle"></i> Inscribirse a la Operación';
+            }
         }
 
         async function cargarParticipantes(operationId) {
@@ -688,6 +735,11 @@
         }
 
         async function inscribirse() {
+            if (registrationClosed) {
+                alert('⛔ Esta operación ya pasó. La inscripción está cerrada.');
+                return;
+            }
+
             const token = localStorage.getItem('token');
             if (!token) {
                 alert('Por favor, inicia sesión para inscribirte.');
@@ -807,6 +859,15 @@
         }
 
         async function confirmJoin() {
+            if (registrationClosed) {
+                const err = document.getElementById('accept-error');
+                if (err) {
+                    err.style.display = 'block';
+                    err.textContent = 'Esta operación ya pasó. La inscripción está cerrada.';
+                }
+                return;
+            }
+
             const opId = getOperacionId();
             const token = localStorage.getItem('token');
             const acceptRequirements = document.getElementById('accept-requirements').checked;
@@ -902,6 +963,7 @@
                 btnInscribir.style.display = 'block';
                 btnDesinscribir.style.display = 'none';
                 estadoDiv.classList.remove('activo');
+                applyRegistrationUiState();
                 return;
             }
 
@@ -919,11 +981,12 @@
                 btnInscribir.style.display = 'block';
                 btnDesinscribir.style.display = 'none';
                 estadoDiv.classList.remove('activo');
+                applyRegistrationUiState();
                 return;
             }
 
-            const data = await response.json().catch(() => ({ registered: false }));
-            if (data && data.registered) {
+            const data = await response.json().catch(() => ({ is_registered: false }));
+            if (data && data.is_registered) {
                 btnInscribir.style.display = 'none';
                 btnDesinscribir.style.display = 'block';
                 estadoDiv.classList.add('activo');
@@ -932,6 +995,8 @@
                 btnDesinscribir.style.display = 'none';
                 estadoDiv.classList.remove('activo');
             }
+
+            applyRegistrationUiState();
         }
 
         // MENÚ HAMBURGUESA RESPONSIVO

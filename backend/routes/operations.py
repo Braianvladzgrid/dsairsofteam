@@ -2,12 +2,36 @@ from flask import Blueprint, request, jsonify
 from models import Operation, Participation, User, db
 from routes.auth import token_required, admin_required
 from schemas import sanitize_input
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 import bleach
 import base64
 
 operations_bp = Blueprint('operations', __name__, url_prefix='/api/operations')
+
+
+def _now_for_operation_date(dt: datetime) -> datetime:
+    """Devuelve un 'now' comparable con dt.
+
+    `dt` puede venir naive o con tzinfo, dependiendo del parseo/DB.
+    """
+    if isinstance(dt, datetime) and dt.tzinfo is not None:
+        return datetime.now(dt.tzinfo)
+    return datetime.utcnow()
+
+
+def _operation_started(operation: Operation) -> bool:
+    if not operation or not operation.start_date:
+        return False
+
+    start = operation.start_date
+    try:
+        return start < _now_for_operation_date(start)
+    except TypeError:
+        # Fallback por si hay mezcla naive/aware
+        if isinstance(start, datetime) and start.tzinfo is not None:
+            start = start.astimezone(timezone.utc).replace(tzinfo=None)
+        return start < datetime.utcnow()
 
 
 def _clean_text(value):
@@ -297,6 +321,13 @@ def join_operation(current_user, operation_id):
 
     if not operation.is_active:
         return jsonify({'error': 'Operation is not active'}), 400
+
+    if operation.status and operation.status != 'active':
+        return jsonify({'error': 'Operation is not open for registration'}), 400
+
+    # Bloquear inscripción si la fecha de juego ya pasó
+    if _operation_started(operation):
+        return jsonify({'error': 'Registration is closed for this operation'}), 400
 
     # Verificar si el usuario ya está registrado
     existing = Participation.query.filter_by(
